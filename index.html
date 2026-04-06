@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가치있는 미래교육 연구소 | 김병찬 대표</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 폰트: Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- 아이콘: Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    },
+                    colors: {
+                        deepblue: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            500: '#334e68',
+                            800: '#102a43',
+                            900: '#0a192f', // 핵심 Deep Blue
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 부드러운 스크롤 */
+        html { scroll-behavior: smooth; }
+        
+        /* 관리자 모드 수정 가능 요소 스타일 */
+        [contenteditable="true"] {
+            outline: 2px dashed #3b82f6;
+            outline-offset: 4px;
+            border-radius: 4px;
+            background-color: rgba(59, 130, 246, 0.05);
+            transition: all 0.2s;
+        }
+        [contenteditable="true"]:focus {
+            outline: 2px solid #2563eb;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .admin-controls { display: none; }
+        body.admin-mode .admin-controls { display: flex; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <i data-lucide="book-open" class="text-deepblue-900 w-8 h-8 mr-2"></i>
+                    <span class="font-bold text-xl text-deepblue-900 tracking-tight editable-text" data-key="site-title">가치있는 미래교육 연구소</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#services" class="text-gray-600 hover:text-deepblue-900 font-medium transition">전문분야</a>
+                    <a href="#reviews" class="text-gray-600 hover:text-deepblue-900 font-medium transition">강의후기</a>
+                    <a href="#about" class="text-gray-600 hover:text-deepblue-900 font-medium transition">프로필</a>
+                    <a href="#contact" class="bg-deepblue-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-deepblue-800 transition shadow-md">강의 의뢰하기</a>
+                </div>
+                <!-- 모바일 메뉴 버튼 -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-deepblue-900 focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 모바일 드롭다운 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-3 shadow-lg">
+            <a href="#services" class="block text-gray-600 font-medium pb-2 border-b border-gray-50">전문분야</a>
+            <a href="#reviews" class="block text-gray-600 font-medium pb-2 border-b border-gray-50">강의후기</a>
+            <a href="#about" class="block text-gray-600 font-medium pb-2 border-b border-gray-50">프로필</a>
+            <a href="#contact" class="block text-deepblue-900 font-bold">강의 의뢰하기</a>
+        </div>
+    </nav>
+
+    <!-- 관리자 저장 플로팅 바 -->
+    <div class="admin-controls fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-2xl border border-blue-200 z-[100] flex items-center space-x-4">
+        <span class="text-sm font-bold text-blue-600 flex items-center"><i data-lucide="shield-check" class="w-4 h-4 mr-1"></i> 관리자 모드 켜짐</span>
+        <button onclick="saveAllEdits()" class="bg-blue-600 text-white px-4 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition flex items-center">
+            <i data-lucide="save" class="w-4 h-4 mr-1"></i> 변경사항 저장
+        </button>
+        <button onclick="toggleAdminMode()" class="text-gray-500 hover:text-gray-700 text-sm font-medium">종료</button>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="pt-32 pb-20 md:pt-40 md:pb-28 bg-deepblue-50 overflow-hidden relative">
+        <div class="absolute inset-0 opacity-10 pattern-dots text-deepblue-900 pointer-events-none"></div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="w-full md:w-1/2 space-y-6 text-center md:text-left">
+                    <div class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold mb-2">
+                        Education Partner
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-deepblue-900 leading-tight">
+                        <span class="block editable-text" data-key="hero-title1">미래를 여는</span> 
+                        <span class="block text-blue-600 editable-text" data-key="hero-title2">교육 파트너, 김병찬</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed editable-text" data-key="hero-desc">
+                        생성형 AI부터 에듀테크, 그리고 리더십까지. 14년 현장 경험을 바탕으로 가장 실질적이고 가치 있는 교육 혁신을 제안합니다.
+                    </p>
+                    <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <a href="#contact" class="bg-deepblue-900 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-deepblue-800 transition shadow-lg flex items-center justify-center">
+                            강의 문의하기 <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                        </a>
+                        <a href="#reviews" class="bg-white text-deepblue-900 border border-gray-200 px-8 py-3.5 rounded-lg font-bold hover:bg-gray-50 transition shadow flex items-center justify-center">
+                            강의 후기 보기
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 사용자 업로드 사진 반영 -->
+                <div class="w-full md:w-1/2 relative flex justify-center">
+                    <div class="absolute inset-0 bg-blue-200 rounded-full blur-3xl opacity-30 transform translate-x-10 translate-y-10"></div>
+                    <img src="ㅇ_ㅇ_20251127_145720.jpg" alt="김병찬 대표" 
+                         class="relative rounded-2xl shadow-2xl object-cover w-[350px] h-[450px] md:w-[400px] md:h-[500px] border-4 border-white"
+                         onerror="this.src='https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
+                    
+                    <!-- Floating Badge -->
+                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-xl flex items-center gap-3 border border-gray-100">
+                        <div class="bg-yellow-100 p-2 rounded-full text-yellow-600">
+                            <i data-lucide="star" class="w-6 h-6 fill-current"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 font-medium">네이버 블로그 후기</div>
+                            <div class="font-bold text-deepblue-900">만족도 최상</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-sm font-bold text-blue-600 tracking-wider uppercase mb-2">Expertise</h2>
+                <h3 class="text-3xl md:text-4xl font-bold text-deepblue-900 editable-text" data-key="service-title">4대 핵심 전문 분야</h3>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mt-6 rounded"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Card 1 -->
+                <div class="group p-8 rounded-2xl bg-gray-50 hover:bg-deepblue-900 transition duration-300 hover:shadow-xl hover:-translate-y-2 border border-gray-100 text-center md:text-left">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 group-hover:bg-white/20 group-hover:text-white rounded-xl flex items-center justify-center mb-6 transition mx-auto md:mx-0">
+                        <i data-lucide="sparkles" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-deepblue-900 group-hover:text-white mb-3 editable-text" data-key="srv1-title">생성형 AI</h4>
+                    <p class="text-gray-600 group-hover:text-gray-300 text-sm leading-relaxed editable-text" data-key="srv1-desc">
+                        ChatGPT, 클로드 등을 활용한 업무 자동화 및 맞춤형 프롬프트 엔지니어링 실습.
+                    </p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="group p-8 rounded-2xl bg-gray-50 hover:bg-deepblue-900 transition duration-300 hover:shadow-xl hover:-translate-y-2 border border-gray-100 text-center md:text-left">
+                    <div class="w-14 h-14 bg-teal-100 text-teal-600 group-hover:bg-white/20 group-hover:text-white rounded-xl flex items-center justify-center mb-6 transition mx-auto md:mx-0">
+                        <i data-lucide="monitor-play" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-deepblue-900 group-hover:text-white mb-3 editable-text" data-key="srv2-title">에듀테크</h4>
+                    <p class="text-gray-600 group-hover:text-gray-300 text-sm leading-relaxed editable-text" data-key="srv2-desc">
+                        디지털 교과서 도입 대비, 미래형 교실 구축과 학생 참여를 이끄는 에듀테크 툴 활용법.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="group p-8 rounded-2xl bg-gray-50 hover:bg-deepblue-900 transition duration-300 hover:shadow-xl hover:-translate-y-2 border border-gray-100 text-center md:text-left">
+                    <div class="w-14 h-14 bg-purple-100 text-purple-600 group-hover:bg-white/20 group-hover:text-white rounded-xl flex items-center justify-center mb-6 transition mx-auto md:mx-0">
+                        <i data-lucide="wrench" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-deepblue-900 group-hover:text-white mb-3 editable-text" data-key="srv3-title">디지털 도구 활용</h4>
+                    <p class="text-gray-600 group-hover:text-gray-300 text-sm leading-relaxed editable-text" data-key="srv3-desc">
+                        노션, 캔바, 구글 워크스페이스 등을 활용한 스마트 워크 및 협업 효율 극대화.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="group p-8 rounded-2xl bg-gray-50 hover:bg-deepblue-900 transition duration-300 hover:shadow-xl hover:-translate-y-2 border border-gray-100 text-center md:text-left">
+                    <div class="w-14 h-14 bg-orange-100 text-orange-600 group-hover:bg-white/20 group-hover:text-white rounded-xl flex items-center justify-center mb-6 transition mx-auto md:mx-0">
+                        <i data-lucide="users" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-deepblue-900 group-hover:text-white mb-3 editable-text" data-key="srv4-title">미래 리더십</h4>
+                    <p class="text-gray-600 group-hover:text-gray-300 text-sm leading-relaxed editable-text" data-key="srv4-desc">
+                        급변하는 디지털 시대에 조직을 이끄는 소통과 혁신의 리더십 마인드셋.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Review Showcase Section -->
+    <section id="reviews" class="py-24 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div class="max-w-2xl">
+                    <h2 class="text-sm font-bold text-blue-600 tracking-wider uppercase mb-2">Review Showcase</h2>
+                    <h3 class="text-3xl md:text-4xl font-bold text-deepblue-900 mb-4 editable-text" data-key="review-title">생생한 현장의 목소리</h3>
+                    <p class="text-gray-600 editable-text" data-key="review-desc">네이버 블로그(blog.naver.com/kbc792000)에 기록된 뜨거운 열기와 수강생들의 진솔한 후기를 확인하세요.</p>
+                </div>
+                <div class="mt-6 md:mt-0 flex gap-2">
+                    <button class="admin-controls bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold flex items-center text-sm" onclick="openReviewModal()">
+                        <i data-lucide="plus" class="w-4 h-4 mr-1"></i> 새 후기 추가 (시트 연동)
+                    </button>
+                    <a href="https://blog.naver.com/kbc792000" target="_blank" class="bg-white border border-gray-200 text-deepblue-900 px-6 py-2.5 rounded-lg font-bold hover:bg-gray-100 transition shadow-sm flex items-center">
+                        블로그 전체보기 <i data-lucide="external-link" class="w-4 h-4 ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Reviews Grid (Dynamic) -->
+            <div id="review-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Data will be injected here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-16 items-center">
+                <div class="w-full lg:w-5/12">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-blue-600 rounded-3xl transform translate-x-4 translate-y-4"></div>
+                        <img src="ㅇ_ㅇ_20251127_145720.jpg" alt="김병찬 대표 프로필" class="relative rounded-3xl w-full h-[500px] object-cover shadow-lg border-8 border-white" onerror="this.src='https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80';">
+                    </div>
+                </div>
+                <div class="w-full lg:w-7/12 space-y-6">
+                    <h2 class="text-sm font-bold text-blue-600 tracking-wider uppercase">About Me</h2>
+                    <h3 class="text-3xl md:text-4xl font-bold text-deepblue-900">
+                        <span class="block mb-2 editable-text" data-key="about-title">"가장 실천적인 교육 혁신을</span>
+                        <span class="block editable-text" data-key="about-title2">디자인합니다."</span>
+                    </h3>
+                    
+                    <div class="prose max-w-none text-gray-600 space-y-4 pt-4">
+                        <p class="editable-text" data-key="about-p1">
+                            14년 간의 학교 현장 경험을 통해 교육의 본질을 깊이 이해하고 있습니다. 기술이 교육을 대체하는 것이 아니라, 교사와 학생의 역량을 확장하는 '가치 있는 도구'로 쓰여야 한다고 믿습니다.
+                        </p>
+                        <p class="editable-text" data-key="about-p2">
+                            Microsoft Innovative Educator Expert (MIEE) 등 다양한 공인 자격을 보유하고 있으며, 전국 수많은 학교와 기관에서 생성형 AI와 에듀테크 연수를 진행하며 검증된 노하우를 전달하고 있습니다.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 pt-6">
+                        <div class="border-l-4 border-blue-600 pl-4">
+                            <div class="text-3xl font-black text-deepblue-900 mb-1">14<span class="text-lg font-bold text-blue-600">+</span></div>
+                            <div class="text-sm font-medium text-gray-500">년 현장 교육 경력</div>
+                        </div>
+                        <div class="border-l-4 border-teal-500 pl-4">
+                            <div class="text-3xl font-black text-deepblue-900 mb-1">MIEE</div>
+                            <div class="text-sm font-medium text-gray-500">Microsoft 인증 교육자</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-deepblue-900 text-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-16">
+                <div class="w-full lg:w-5/12 space-y-8">
+                    <div>
+                        <h2 class="text-sm font-bold text-blue-400 tracking-wider uppercase mb-2">Contact</h2>
+                        <h3 class="text-3xl md:text-4xl font-bold mb-4">강의를 의뢰하시겠습니까?</h3>
+                        <p class="text-blue-100 opacity-80">
+                            기관의 특성과 요구사항에 맞춘 최적의 맞춤형 커리큘럼을 제안해 드립니다. 아래 폼을 통해 편하게 문의해 주세요.
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-6 pt-4">
+                        <div class="flex items-start">
+                            <div class="bg-blue-800 p-3 rounded-lg mr-4">
+                                <i data-lucide="mail" class="w-6 h-6 text-blue-300"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">이메일</h4>
+                                <p class="text-blue-200">kbc792000@naver.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-blue-800 p-3 rounded-lg mr-4">
+                                <i data-lucide="book-open" class="w-6 h-6 text-blue-300"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">블로그</h4>
+                                <p class="text-blue-200">blog.naver.com/kbc792000</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-7/12">
+                    <div class="bg-white rounded-2xl p-8 shadow-2xl relative">
+                        <!-- Loading Overlay -->
+                        <div id="form-loading" class="hidden absolute inset-0 bg-white/90 rounded-2xl z-10 flex flex-col items-center justify-center">
+                            <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin mb-4"></i>
+                            <p class="text-gray-800 font-bold">전송 중입니다...</p>
+                        </div>
+                        
+                        <!-- Success Message -->
+                        <div id="form-success" class="hidden absolute inset-0 bg-white rounded-2xl z-10 flex flex-col items-center justify-center p-8 text-center">
+                            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
+                                <i data-lucide="check" class="w-8 h-8"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold text-deepblue-900 mb-2">성공적으로 전송되었습니다!</h4>
+                            <p class="text-gray-600 mb-6">검토 후 기재해주신 연락처로 빠르게 회신 드리겠습니다.</p>
+                            <button type="button" onclick="resetForm()" class="bg-deepblue-900 text-white px-6 py-2 rounded-lg font-bold hover:bg-deepblue-800">새 문의 작성하기</button>
+                        </div>
+
+                        <form id="contactForm" onsubmit="submitForm(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">담당자 성함</label>
+                                    <input type="text" id="req-name" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">기관/학교명</label>
+                                    <input type="text" id="req-org" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-800">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">이메일 또는 연락처</label>
+                                <input type="text" id="req-contact" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-800">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">강의 희망 분야 및 내용</label>
+                                <textarea id="req-msg" rows="4" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-800 resize-none" placeholder="예: 생성형 AI를 활용한 교사업무 경감 연수를 희망합니다. (일정: 11월 중)"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition shadow-lg">
+                                구글 시트로 문의 접수하기
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0 text-center md:text-left">
+                <div class="text-white font-bold text-xl mb-2 flex items-center justify-center md:justify-start">
+                    <i data-lucide="book-open" class="w-6 h-6 mr-2 text-blue-500"></i> 가치있는 미래교육 연구소
+                </div>
+                <p class="text-sm">대표: 김병찬 | Email: kbc792000@naver.com</p>
+                <p class="text-sm mt-1">© 2025 가치있는 미래교육 연구소. All rights reserved.</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="https://blog.naver.com/kbc792000" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-green-600 hover:text-white transition cursor-pointer" title="네이버 블로그">
+                    <span class="font-bold text-sm">B</span>
+                </a>
+                <!-- Hidden Admin Trigger -->
+                <button onclick="promptAdmin()" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer" title="관리자 로그인">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Review Add Modal (Admin Only) -->
+    <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[200] flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-deepblue-900">블로그 후기 추가</h3>
+                <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-gray-500 mb-4">구글 스프레드시트에 연동되어 홈페이지 메인에 즉시 표시됩니다.</p>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">후기 제목</label>
+                    <input type="text" id="new-review-title" class="w-full px-3 py-2 border rounded-md" placeholder="예: 구미 금오고 생성형 AI 교사 연수 후기">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">내용 요약 (1~2줄)</label>
+                    <textarea id="new-review-desc" rows="2" class="w-full px-3 py-2 border rounded-md" placeholder="뜨거웠던 연수 현장을 소개합니다."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">블로그 썸네일 이미지 URL</label>
+                    <input type="text" id="new-review-img" class="w-full px-3 py-2 border rounded-md" placeholder="https://...">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">블로그 포스팅 링크 URL</label>
+                    <input type="text" id="new-review-link" class="w-full px-3 py-2 border rounded-md" placeholder="https://blog.naver.com/kbc792000/...">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">날짜/태그</label>
+                    <input type="text" id="new-review-date" class="w-full px-3 py-2 border rounded-md" placeholder="예: 2025. 11. | 에듀테크">
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end space-x-3">
+                <button onclick="closeReviewModal()" class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-md">취소</button>
+                <button onclick="addReview()" class="px-4 py-2 bg-blue-600 text-white font-medium hover:bg-blue-700 rounded-md flex items-center">
+                    <i data-lucide="plus" class="w-4 h-4 mr-1"></i> 추가하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // 1. Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-md');
+                nav.classList.remove('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-md');
+                nav.classList.add('shadow-sm');
+            }
+        });
+
+        // 2. Mock Data (Google Sheets 대체용 초기 데이터)
+        // 실제 운영 시 Google Apps Script 웹앱 URL을 통해 fetch 합니다.
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrzdamj97JkYBWZBtHLYtw4sWH6cUld5dsQmHDgDFo_-mGhK6hYZkElxGuJ2QPFd0/exec"; // readme.md 의 배포된 URL을 여기에 넣습니다.
+        
+        let mockReviews = [
+            {
+                id: 1,
+                title: "충남교육청 인공지능 기반 미래교육 리더십 연수",
+                desc: "관리자 선생님들과 함께한 AI 활용 학교 경영 혁신 마인드셋 연수 현장입니다. 높은 만족도를 기록했습니다.",
+                imgUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
+                link: "https://blog.naver.com/kbc792000",
+                date: "2025. 11. | 리더십"
+            },
+            {
+                id: 2,
+                title: "서울 OO초등학교 디지털 교과서 선도교원 연수",
+                desc: "태블릿을 활용한 에듀테크 실습. 캔바와 노션을 활용하여 실제 수업에 바로 적용할 수 있는 팁을 나누었습니다.",
+                imgUrl: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80",
+                link: "https://blog.naver.com/kbc792000",
+                date: "2025. 10. | 에듀테크"
+            },
+            {
+                id: 3,
+                title: "생성형 AI를 활용한 교사업무 혁신 특강",
+                desc: "성적 처리부터 공문 작성 초안까지, ChatGPT를 활용하여 퇴근 시간을 앞당기는 실전 노하우 방출!",
+                imgUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80",
+                link: "https://blog.naver.com/kbc792000",
+                date: "2025. 09. | 생성형 AI"
+            }
+        ];
+
+        // 3. Render Reviews Function
+        function renderReviews() {
+            const grid = document.getElementById('review-grid');
+            grid.innerHTML = '';
+            
+            mockReviews.forEach(review => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 border border-gray-100 flex flex-col h-full group";
+                
+                // Admin Delete Button
+                const adminBtn = document.body.classList.contains('admin-mode') 
+                    ? `<button onclick="deleteReview(${review.id})" class="absolute top-3 right-3 bg-red-500 text-white p-2 rounded-full shadow hover:bg-red-600 z-10"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="relative overflow-hidden aspect-video">
+                        ${adminBtn}
+                        <img src="${review.imgUrl}" alt="${review.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                            <span class="text-white font-medium text-sm"><i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>${review.date}</span>
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="text-xs font-bold text-blue-600 mb-2 uppercase tracking-wide">${review.date.split('|')[1] || 'Review'}</div>
+                        <h4 class="text-lg font-bold text-deepblue-900 mb-2 line-clamp-2 leading-snug">${review.title}</h4>
+                        <p class="text-gray-600 text-sm mb-6 line-clamp-3 flex-grow">${review.desc}</p>
+                        <a href="${review.link}" target="_blank" class="inline-flex items-center text-blue-600 font-bold hover:text-blue-800 transition mt-auto">
+                            블로그에서 읽기 <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons(); // Re-initialize icons for dynamic content
+        }
+
+        // Initialize display
+        document.addEventListener('DOMContentLoaded', () => {
+            renderReviews();
+            loadTextContent();
+        });
+
+        // 4. Contact Form Handling
+        function submitForm(e) {
+            e.preventDefault();
+            
+            // Show loading
+            document.getElementById('form-loading').classList.remove('hidden');
+            
+            const data = {
+                name: document.getElementById('req-name').value,
+                org: document.getElementById('req-org').value,
+                contact: document.getElementById('req-contact').value,
+                message: document.getElementById('req-msg').value
+            };
+
+            // Simulate API Call to Google Sheets (Code.gs)
+            console.log("의뢰 데이터 (구글 시트로 전송될 내용):", data);
+            
+            setTimeout(() => {
+                document.getElementById('form-loading').classList.add('hidden');
+                document.getElementById('form-success').classList.remove('hidden');
+            }, 1500);
+        }
+
+        function resetForm() {
+            document.getElementById('contactForm').reset();
+            document.getElementById('form-success').classList.add('hidden');
+        }
+
+        // 5. Admin & Content Management System (No-Code approach)
+        function promptAdmin() {
+            const pwd = prompt("관리자 비밀번호를 입력하세요 (데모용 기본값: admin)");
+            if (pwd === "admin") {
+                toggleAdminMode(true);
+            } else if (pwd !== null) {
+                alert("비밀번호가 틀렸습니다.");
+            }
+        }
+
+        function toggleAdminMode(turnOn = false) {
+            if (turnOn) {
+                document.body.classList.add('admin-mode');
+                // Make text editable
+                document.querySelectorAll('.editable-text').forEach(el => {
+                    el.setAttribute('contenteditable', 'true');
+                });
+                renderReviews(); // Re-render to show delete buttons
+                alert("관리자 모드가 활성화되었습니다. 텍스트를 클릭하여 수정할 수 있습니다.");
+            } else {
+                document.body.classList.remove('admin-mode');
+                document.querySelectorAll('.editable-text').forEach(el => {
+                    el.setAttribute('contenteditable', 'false');
+                });
+                renderReviews();
+            }
+        }
+
+        // 텍스트 로컬저장소 임시 로딩 (데모용)
+        function loadTextContent() {
+            const saved = localStorage.getItem('siteContent');
+            if(saved) {
+                const data = JSON.parse(saved);
+                document.querySelectorAll('.editable-text').forEach(el => {
+                    const key = el.getAttribute('data-key');
+                    if(data[key]) el.innerHTML = data[key];
+                });
+            }
+            const savedReviews = localStorage.getItem('siteReviews');
+            if(savedReviews) {
+                mockReviews = JSON.parse(savedReviews);
+                renderReviews();
+            }
+        }
+
+        // 구글 시트 저장 시뮬레이션
+        function saveAllEdits() {
+            const data = {};
+            document.querySelectorAll('.editable-text').forEach(el => {
+                const key = el.getAttribute('data-key');
+                data[key] = el.innerHTML;
+            });
+            
+            // 실제 구현에서는 이 데이터를 fetch()를 통해 Google Apps Script로 전송합니다.
+            console.log("저장될 콘텐츠 데이터:", data);
+            localStorage.setItem('siteContent', JSON.stringify(data));
+            localStorage.setItem('siteReviews', JSON.stringify(mockReviews));
+            
+            const btn = document.querySelector('.admin-controls button:first-child');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 mr-1"></i> 저장됨!`;
+            lucide.createIcons();
+            setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 2000);
+        }
+
+        // 6. Review Modal Logic
+        function openReviewModal() {
+            document.getElementById('review-modal').classList.remove('hidden');
+        }
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.add('hidden');
+        }
+        
+        function addReview() {
+            const title = document.getElementById('new-review-title').value;
+            const desc = document.getElementById('new-review-desc').value;
+            const imgUrl = document.getElementById('new-review-img').value || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80';
+            const link = document.getElementById('new-review-link').value || 'https://blog.naver.com/kbc792000';
+            const date = document.getElementById('new-review-date').value;
+
+            if(!title || !desc) {
+                alert("제목과 내용은 필수입니다."); return;
+            }
+
+            const newReview = {
+                id: Date.now(),
+                title, desc, imgUrl, link, date
+            };
+
+            mockReviews.unshift(newReview); // 맨 앞에 추가
+            renderReviews();
+            saveAllEdits(); // 로컬 저장
+            closeReviewModal();
+            
+            // 입력창 초기화
+            document.querySelectorAll('#review-modal input, #review-modal textarea').forEach(el => el.value = '');
+        }
+
+        function deleteReview(id) {
+            if(confirm("이 후기를 삭제하시겠습니까?")) {
+                mockReviews = mockReviews.filter(r => r.id !== id);
+                renderReviews();
+                saveAllEdits();
+            }
+        }
+    </script>
+</body>
+</html>
