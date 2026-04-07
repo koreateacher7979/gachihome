@@ -32,17 +32,17 @@
         body { font-family: 'Pretendard', sans-serif; scroll-behavior: smooth; }
         
         /* 관리자 모드 스타일 */
-        .admin-mode [data-editable] {
+        .admin-mode [data-editable], .admin-mode .editable-image {
             border: 2px dashed #f59e0b;
             padding: 2px;
             cursor: pointer;
             position: relative;
             transition: all 0.2s;
         }
-        .admin-mode [data-editable]:hover {
+        .admin-mode [data-editable]:hover, .admin-mode .editable-image:hover {
             background-color: rgba(245, 158, 11, 0.1);
         }
-        .admin-mode [data-editable]::after {
+        .admin-mode [data-editable]::after, .admin-mode .editable-image::after {
             content: '클릭하여 수정';
             position: absolute;
             top: -25px;
@@ -54,8 +54,9 @@
             border-radius: 4px;
             opacity: 0;
             pointer-events: none;
+            white-space: nowrap;
         }
-        .admin-mode [data-editable]:hover::after { opacity: 1; }
+        .admin-mode [data-editable]:hover::after, .admin-mode .editable-image:hover::after { opacity: 1; }
         
         .toast {
             position: fixed;
@@ -78,8 +79,10 @@
     <nav class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-50 transition-all duration-300">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <span class="font-bold text-2xl text-brand-deep tracking-tight">가치있는 <span class="text-brand-accent">미래교육</span> 연구소</span>
+                <!-- 로고 영역 -->
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img id="logo_image" src="https://via.placeholder.com/40x40/E6F0FA/3B82F6?text=LOGO" alt="로고" class="h-10 w-auto object-contain rounded editable-image" onclick="event.stopPropagation(); editImage('logo_image')" title="로고 이미지">
+                    <span class="font-bold text-2xl text-brand-deep tracking-tight" data-editable="site_name">가치있는 <span class="text-brand-accent">미래교육</span> 연구소</span>
                 </div>
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex space-x-8 items-center">
@@ -132,8 +135,7 @@
                     </div>
                 </div>
                 <div class="md:w-1/2">
-                    <!-- 처음에는 투명한 배경, 로컬스토리지 캐시를 통해 0.1초만에 사진이 뜨도록 설계 -->
-                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer" onclick="editImage('hero_image')">
+                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer editable-image" onclick="editImage('hero_image')">
                         <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent flex items-end p-6">
                             <div class="text-white">
@@ -231,7 +233,7 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-16 items-center">
                 <div class="md:w-5/12">
-                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl" onclick="editImage('profile_image')">
+                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image" onclick="editImage('profile_image')">
                         <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -298,6 +300,10 @@
                                 <option>기타 맞춤형 연수</option>
                             </select>
                         </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">예상 강의료 (선택 사항)</label>
+                        <input type="text" id="contact_fee" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-accent focus:border-transparent transition" placeholder="예: 2시간 100만원 / 협의 후 결정">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">상세 문의 내용 (일정, 대상 등)</label>
@@ -390,7 +396,6 @@
             const loader = document.getElementById('reviews-loader');
             const container = document.getElementById('reviews-container');
             
-            // ★ 개선: 로컬 스토리지 캐시를 통해 대기 시간 없이 즉시 렌더링 (0.1초 컷)
             const cachedData = localStorage.getItem('kbc_site_data');
             if(cachedData) {
                 try {
@@ -406,7 +411,6 @@
                     return;
                 }
 
-                // 백그라운드에서 최신 데이터를 동기화
                 const cacheBuster = new Date().getTime();
                 const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${cacheBuster}`;
                 
@@ -414,7 +418,6 @@
                 const data = await response.json();
                 
                 if(data.success) {
-                    // 최신 데이터 캐시 저장 및 화면 반영
                     localStorage.setItem('kbc_site_data', JSON.stringify(data));
                     applySettings(data.settings);
                     renderReviews(data.reviews);
@@ -435,11 +438,11 @@
                 const el = document.querySelector(`[data-editable="${key}"]`);
                 if(el && value) el.innerText = value;
                 
-                if(key === 'hero_image' || key === 'profile_image') {
+                // 로고 이미지가 추가되었으므로 조건문에 logo_image 포함
+                if(key === 'hero_image' || key === 'profile_image' || key === 'logo_image') {
                     const imgEl = document.getElementById(key);
                     if(imgEl && value) {
                         const newSrc = convertGDriveLink(value);
-                        // 캐시에 있는 이미지와 동일하면 재로딩(깜빡임) 방지
                         if (imgEl.src !== newSrc) {
                             imgEl.src = newSrc;
                         }
@@ -501,6 +504,7 @@
                     org: document.getElementById('contact_org').value,
                     email: document.getElementById('contact_email').value,
                     topic: document.getElementById('contact_topic').value,
+                    fee: document.getElementById('contact_fee').value,
                     message: document.getElementById('contact_message').value
                 };
 
@@ -533,7 +537,7 @@
         }
 
         // ==========================================
-        // 4. 관리자 모드 (No-Code Admin)
+        // 4. 관리자 모드 (No-Code Admin) 및 파일 직접 업로드
         // ==========================================
         function toggleAdminMode() {
             if(isAdmin) {
@@ -581,13 +585,68 @@
 
         async function editImage(imageId) {
             if(!isAdmin) return;
-            const currentSrc = document.getElementById(imageId).src;
-            let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 복사 등):", currentSrc);
             
-            if(newSrc && newSrc !== currentSrc) {
-                await saveSetting(imageId, newSrc);
-                const directImgUrl = convertGDriveLink(newSrc);
-                document.getElementById(imageId).src = directImgUrl;
+            const choice = confirm("PC/스마트폰에 있는 '사진 파일'을 직접 업로드 하시겠습니까?\n(취소를 누르면 기존처럼 링크를 입력합니다.)");
+            
+            if (choice) {
+                // 파일 업로드
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                
+                fileInput.onchange = async e => {
+                    const file = e.target.files[0];
+                    if(!file) return;
+                    
+                    if(file.size > 5 * 1024 * 1024) { 
+                        alert("이미지 용량이 너무 큽니다. 5MB 이하의 사진을 선택해주세요.");
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = async function(event) {
+                        const base64Data = event.target.result.split(',')[1];
+                        
+                        showToast("사진을 서버로 업로드 중입니다. 잠시만 기다려주세요...");
+                        
+                        try {
+                            const response = await fetch(GAS_WEBAPP_URL, {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    action: "uploadImage",
+                                    filename: file.name,
+                                    mimeType: file.type,
+                                    data: base64Data
+                                })
+                            });
+                            
+                            const result = await response.json();
+                            if(result.success && result.fileId) {
+                                const newUrl = `https://lh3.googleusercontent.com/d/${result.fileId}`;
+                                await saveSetting(imageId, newUrl);
+                                document.getElementById(imageId).src = newUrl;
+                                showToast("사진 업로드 및 적용 완료!");
+                            } else {
+                                alert("업로드에 실패했습니다.");
+                            }
+                        } catch(err) {
+                            console.error(err);
+                            alert("업로드 중 통신 오류가 발생했습니다.");
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                };
+                fileInput.click();
+            } else {
+                // 기존 링크 입력
+                const currentSrc = document.getElementById(imageId).src;
+                let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 복사 등):", currentSrc);
+                
+                if(newSrc && newSrc !== currentSrc) {
+                    await saveSetting(imageId, newSrc);
+                    const directImgUrl = convertGDriveLink(newSrc);
+                    document.getElementById(imageId).src = directImgUrl;
+                }
             }
         }
 
@@ -616,9 +675,60 @@
             if(!title) return;
             const link = prompt("네이버 블로그 링크 URL:");
             if(!link) return;
-            let image = prompt("썸네일 이미지 URL (구글 드라이브 링크 가능):");
-            if(!image) return;
+            
+            const choice = confirm("썸네일 사진을 파일로 직접 업로드 하시겠습니까?\n(취소 클릭 시 기존처럼 링크로 입력)");
+            
+            if (choice) {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                
+                fileInput.onchange = async e => {
+                    const file = e.target.files[0];
+                    if(!file) return;
+                    
+                    if(file.size > 5 * 1024 * 1024) {
+                        alert("이미지 용량은 5MB 이하여야 합니다.");
+                        return;
+                    }
 
+                    const reader = new FileReader();
+                    reader.onload = async function(event) {
+                        const base64Data = event.target.result.split(',')[1];
+                        
+                        showToast("리뷰 이미지 업로드 중...");
+                        try {
+                            const response = await fetch(GAS_WEBAPP_URL, {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    action: "uploadImage",
+                                    filename: file.name,
+                                    mimeType: file.type,
+                                    data: base64Data
+                                })
+                            });
+                            const result = await response.json();
+                            if(result.success && result.fileId) {
+                                const newUrl = `https://lh3.googleusercontent.com/d/${result.fileId}`;
+                                saveReviewData(title, link, newUrl);
+                            } else {
+                                alert("이미지 업로드 실패");
+                            }
+                        } catch(err) {
+                            alert("업로드 통신 오류");
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                };
+                fileInput.click();
+            } else {
+                let image = prompt("썸네일 이미지 URL (구글 드라이브 링크 가능):");
+                if(!image) return;
+                saveReviewData(title, link, image);
+            }
+        }
+
+        async function saveReviewData(title, link, image) {
             const payload = {
                 action: "addReview",
                 title: title,
