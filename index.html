@@ -132,8 +132,8 @@
                     </div>
                 </div>
                 <div class="md:w-1/2">
-                    <!-- 기본 이미지를 제거하고 로딩 전에는 회색 배경(bg-gray-200)이 보이도록 수정 -->
-                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer bg-gray-200" onclick="editImage('hero_image')">
+                    <!-- 처음에는 투명한 배경, 로컬스토리지 캐시를 통해 0.1초만에 사진이 뜨도록 설계 -->
+                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer" onclick="editImage('hero_image')">
                         <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent flex items-end p-6">
                             <div class="text-white">
@@ -231,8 +231,7 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-16 items-center">
                 <div class="md:w-5/12">
-                    <!-- 기본 이미지를 제거하고 로딩 전에는 회색 배경(bg-gray-200)이 보이도록 수정 -->
-                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl bg-gray-200" onclick="editImage('profile_image')">
+                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl" onclick="editImage('profile_image')">
                         <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -338,46 +337,39 @@
         // ==========================================
         // 1. 설정 및 상태
         // ==========================================
-        // ★ 중요: Code.gs를 배포한 후 발급받은 '웹앱 URL'을 아래에 붙여넣으세요.
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
-        const ADMIN_PASSWORD = "0330"; // 데모용 임시 비밀번호 (실제 사용시 변경 권장)
+        const ADMIN_PASSWORD = "0330"; 
 
-        // 임시 데모 데이터
         const mockReviews = [
             { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" },
             { id: 2, title: "생성형 AI 시대의 교사 리더십 워크숍", date: "2023.10.15", image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
         ];
 
         // ==========================================
-        // 유틸리티: 구글 드라이브 링크 변환 함수 (우회 로직 적용)
+        // 유틸리티: 구글 드라이브 링크 변환 함수
         // ==========================================
         function convertGDriveLink(url) {
             if (!url) return url;
             
             let fileId = null;
-            
-            // 패턴 1: 구글 드라이브 공유 링크 (공유 링크 복사 시)
             const regex1 = /\/file\/d\/([a-zA-Z0-9_-]+)/;
             const match1 = url.match(regex1);
             if (match1 && match1[1]) fileId = match1[1];
             
-            // 패턴 2: 구글 드라이브 상단 URL 파라미터 (id=...)
             const regex2 = /[?&]id=([a-zA-Z0-9_-]+)/;
             const match2 = url.match(regex2);
             if (url.includes('drive.google.com') && match2 && match2[1]) fileId = match2[1];
 
             if (fileId) {
-                // CDN을 통한 가장 안정적인 구글 드라이브 이미지 핫링킹 방식 (공유권한 필수)
                 return `https://lh3.googleusercontent.com/d/${fileId}`; 
             }
-            
-            return url; // 일반 이미지 주소면 그대로 반환
+            return url; 
         }
 
         // ==========================================
-        // 2. 초기화 및 데이터 로딩
+        // 2. 초기화 및 데이터 로딩 (캐시 적용)
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             initMobileMenu();
@@ -398,13 +390,23 @@
             const loader = document.getElementById('reviews-loader');
             const container = document.getElementById('reviews-container');
             
+            // ★ 개선: 로컬 스토리지 캐시를 통해 대기 시간 없이 즉시 렌더링 (0.1초 컷)
+            const cachedData = localStorage.getItem('kbc_site_data');
+            if(cachedData) {
+                try {
+                    const parsed = JSON.parse(cachedData);
+                    applySettings(parsed.settings);
+                    renderReviews(parsed.reviews);
+                } catch(e) { console.error("캐시 파싱 오류", e); }
+            }
+
             try {
                 if(!GAS_WEBAPP_URL) {
-                    renderReviews(mockReviews);
+                    if(!cachedData) renderReviews(mockReviews);
                     return;
                 }
 
-                // ★ 중요: 브라우저가 과거 데이터를 기억(캐싱)하지 못하게 타임스탬프 강제 추가
+                // 백그라운드에서 최신 데이터를 동기화
                 const cacheBuster = new Date().getTime();
                 const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${cacheBuster}`;
                 
@@ -412,14 +414,16 @@
                 const data = await response.json();
                 
                 if(data.success) {
+                    // 최신 데이터 캐시 저장 및 화면 반영
+                    localStorage.setItem('kbc_site_data', JSON.stringify(data));
                     applySettings(data.settings);
                     renderReviews(data.reviews);
-                } else {
+                } else if(!cachedData) {
                     renderReviews(mockReviews);
                 }
             } catch (error) {
                 console.error("데이터 로드 실패:", error);
-                renderReviews(mockReviews);
+                if(!cachedData) renderReviews(mockReviews);
             } finally {
                 loader.classList.add('hidden');
                 container.classList.remove('hidden');
@@ -427,16 +431,18 @@
         }
 
         function applySettings(settings) {
-            // key-value로 구성된 settings 객체를 화면에 적용
             for(const [key, value] of Object.entries(settings)) {
                 const el = document.querySelector(`[data-editable="${key}"]`);
                 if(el && value) el.innerText = value;
                 
-                // 이미지 처리
                 if(key === 'hero_image' || key === 'profile_image') {
                     const imgEl = document.getElementById(key);
                     if(imgEl && value) {
-                        imgEl.src = convertGDriveLink(value);
+                        const newSrc = convertGDriveLink(value);
+                        // 캐시에 있는 이미지와 동일하면 재로딩(깜빡임) 방지
+                        if (imgEl.src !== newSrc) {
+                            imgEl.src = newSrc;
+                        }
                     }
                 }
             }
@@ -452,10 +458,7 @@
                 card.target = "_blank";
                 card.className = "group bg-brand-deep rounded-2xl overflow-hidden border border-white/10 hover:border-brand-accent transition-all duration-300 block";
                 
-                // 관리자 모드 시 삭제 버튼 추가 용도
                 const deleteBtnHtml = isAdmin ? `<button onclick="deleteReview(event, '${review.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full z-10 hover:bg-red-600"><i class="ph ph-trash"></i></button>` : '';
-
-                // 리뷰 이미지도 구글 드라이브 링크가 섞여 있을 수 있으니 변환 함수 통과
                 const safeImageUrl = convertGDriveLink(review.image);
 
                 card.innerHTML = `
@@ -538,7 +541,7 @@
                 document.body.classList.remove('admin-mode');
                 document.getElementById('admin-add-review').classList.add('hidden');
                 showToast("관리자 모드가 종료되었습니다.");
-                loadData(); // UI 리셋용
+                loadData(); 
             } else {
                 const pwd = prompt("관리자 비밀번호를 입력하세요:");
                 if(pwd === ADMIN_PASSWORD) {
@@ -547,7 +550,7 @@
                     document.getElementById('admin-add-review').classList.remove('hidden');
                     setupEditableElements();
                     showToast("관리자 모드 활성화 됨. 텍스트를 클릭하여 수정하세요.");
-                    loadData(); // 삭제 버튼 표시를 위해 리렌더링
+                    loadData(); 
                 } else if(pwd) {
                     alert("비밀번호가 틀렸습니다.");
                 }
@@ -556,7 +559,6 @@
 
         function setupEditableElements() {
             document.querySelectorAll('[data-editable]').forEach(el => {
-                // 중복 이벤트 방지
                 el.replaceWith(el.cloneNode(true));
             });
             
@@ -583,10 +585,7 @@
             let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 복사 등):", currentSrc);
             
             if(newSrc && newSrc !== currentSrc) {
-                // 구글 시트에는 입력받은 원본 링크 저장
                 await saveSetting(imageId, newSrc);
-                
-                // 화면 즉각 반영 (썸네일 우회 링크 적용)
                 const directImgUrl = convertGDriveLink(newSrc);
                 document.getElementById(imageId).src = directImgUrl;
             }
@@ -624,7 +623,7 @@
                 action: "addReview",
                 title: title,
                 link: link,
-                image: image, // 원본 링크 저장
+                image: image, 
                 date: new Date().toLocaleDateString('ko-KR')
             };
 
@@ -637,7 +636,7 @@
                 const result = await response.json();
                 if(result.success) {
                     showToast("리뷰 추가 완료!");
-                    loadData(); // 재로딩
+                    loadData(); 
                 }
             } catch(e) {
                 showToast("리뷰 추가 실패");
