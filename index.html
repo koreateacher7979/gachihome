@@ -352,22 +352,28 @@
         ];
 
         // ==========================================
-        // 유틸리티: 구글 드라이브 링크 변환 함수
+        // 유틸리티: 구글 드라이브 링크 변환 함수 (우회 로직 적용)
         // ==========================================
         function convertGDriveLink(url) {
             if (!url) return url;
-            // 구글 드라이브 공유 링크 패턴 1 (공유 링크 복사 시)
+            
+            let fileId = null;
+            
+            // 패턴 1: 구글 드라이브 공유 링크 (공유 링크 복사 시)
             const regex1 = /\/file\/d\/([a-zA-Z0-9_-]+)/;
             const match1 = url.match(regex1);
-            if (match1 && match1[1]) {
-                return `https://drive.google.com/uc?export=view&id=${match1[1]}`;
-            }
-            // 구글 드라이브 공유 링크 패턴 2 (상단 URL 복사 시)
+            if (match1 && match1[1]) fileId = match1[1];
+            
+            // 패턴 2: 구글 드라이브 상단 URL 파라미터 (id=...)
             const regex2 = /[?&]id=([a-zA-Z0-9_-]+)/;
             const match2 = url.match(regex2);
-            if (url.includes('drive.google.com') && match2 && match2[1]) {
-                return `https://drive.google.com/uc?export=view&id=${match2[1]}`;
+            if (url.includes('drive.google.com') && match2 && match2[1]) fileId = match2[1];
+
+            if (fileId) {
+                // 기존 uc?export=view 대신 drive.google.com/thumbnail 방식 사용 (핫링킹 차단 우회)
+                return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`; 
             }
+            
             return url; // 일반 이미지 주소면 그대로 반환
         }
 
@@ -587,12 +593,13 @@
             let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 복사 등):", currentSrc);
             
             if(newSrc && newSrc !== currentSrc) {
-                // 구글 드라이브 링크가 입력되었을 경우 다운로드용 직접 링크로 변환
-                const directImgUrl = convertGDriveLink(newSrc);
+                // 구글 시트에는 입력받은 원본 링크(또는 이전 로직으로 변환된 링크)를 저장
+                // 화면에 표시할 때는 convertGDriveLink()를 거치도록 함
+                await saveSetting(imageId, newSrc);
                 
+                // 화면 즉각 반영 (썸네일 우회 링크 적용)
+                const directImgUrl = convertGDriveLink(newSrc);
                 document.getElementById(imageId).src = directImgUrl;
-                // 구글 시트에는 변환된 직접 주소를 저장
-                await saveSetting(imageId, directImgUrl);
             }
         }
 
@@ -624,14 +631,11 @@
             let image = prompt("썸네일 이미지 URL (구글 드라이브 링크 가능):");
             if(!image) return;
 
-            // 추가할 때 썸네일 이미지도 구글 드라이브 링크 변환 로직 적용
-            image = convertGDriveLink(image);
-
             const payload = {
                 action: "addReview",
                 title: title,
                 link: link,
-                image: image,
+                image: image, // 원본 링크 저장
                 date: new Date().toLocaleDateString('ko-KR')
             };
 
