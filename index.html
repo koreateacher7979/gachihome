@@ -81,7 +81,7 @@
             <div class="flex justify-between items-center h-20">
                 <!-- 로고 영역 -->
                 <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <img id="logo_image" src="https://via.placeholder.com/40x40/E6F0FA/3B82F6?text=LOGO" alt="로고" class="h-10 w-auto object-contain rounded editable-image" onclick="event.stopPropagation(); editImage('logo_image')" title="로고 이미지" referrerpolicy="no-referrer">
+                    <img id="logo_image" src="https://via.placeholder.com/40x40/E6F0FA/3B82F6?text=LOGO" alt="로고" class="h-10 w-auto object-contain rounded editable-image" onclick="event.stopPropagation(); editImage('logo_image')" title="로고 이미지">
                     <span class="font-bold text-2xl text-brand-deep tracking-tight" data-editable="site_name">가치있는 <span class="text-brand-accent">미래교육</span> 연구소</span>
                 </div>
                 <!-- Desktop Menu -->
@@ -136,7 +136,7 @@
                 </div>
                 <div class="w-full md:w-1/2">
                     <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer editable-image bg-gray-100" onclick="editImage('hero_image')">
-                        <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer">
+                        <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent flex items-end p-6">
                             <div class="text-white relative z-10">
                                 <p class="font-bold text-xl">김병찬 대표</p>
@@ -234,7 +234,7 @@
             <div class="flex flex-col md:flex-row gap-16 items-center">
                 <div class="w-full md:w-5/12">
                     <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image bg-gray-100" onclick="editImage('profile_image')">
-                        <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
+                        <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="absolute inset-0 w-full h-full object-cover">
                     </div>
                 </div>
                 <div class="md:w-7/12">
@@ -354,10 +354,10 @@
         ];
 
         // ==========================================
-        // 유틸리티: 구글 드라이브 링크 변환 함수
+        // 유틸리티: 모바일 완벽 대응 구글 드라이브 다중 폴백(Fallback) 함수
         // ==========================================
-        function convertGDriveLink(url) {
-            if (!url) return url;
+        function getGDriveUrls(url) {
+            if (!url) return null;
             
             let fileId = null;
             const regex1 = /\/file\/d\/([a-zA-Z0-9_-]+)/;
@@ -368,10 +368,38 @@
             const match2 = url.match(regex2);
             if (url.includes('drive.google.com') && match2 && match2[1]) fileId = match2[1];
 
+            const regex3 = /lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/;
+            const match3 = url.match(regex3);
+            if (match3 && match3[1]) fileId = match3[1];
+
             if (fileId) {
-                return `https://lh3.googleusercontent.com/d/${fileId}`; 
+                return [
+                    `https://lh3.googleusercontent.com/d/${fileId}`, // 1순위: 데스크탑용 고속 CDN
+                    `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, // 2순위: 모바일 우회용 썸네일 API
+                    `https://drive.google.com/uc?export=view&id=${fileId}` // 3순위: 기본 예전 방식
+                ];
             }
-            return url; 
+            return [url]; 
+        }
+
+        function setupImageFallback(imgEl, urls) {
+            if (!imgEl || !urls || urls.length === 0) return;
+            
+            imgEl.dataset.urls = JSON.stringify(urls);
+            imgEl.dataset.urlIdx = "0";
+            imgEl.src = urls[0];
+            
+            // 앞선 URL이 모바일에서 차단될 경우, 즉각 다음 URL로 스위칭하는 자동 우회 로직
+            imgEl.onerror = function() {
+                let idx = parseInt(this.dataset.urlIdx) + 1;
+                let parsedUrls = JSON.parse(this.dataset.urls);
+                if (idx < parsedUrls.length) {
+                    this.dataset.urlIdx = idx.toString();
+                    this.src = parsedUrls[idx];
+                } else {
+                    this.onerror = null;
+                }
+            };
         }
 
         // ==========================================
@@ -442,10 +470,8 @@
                 if(key === 'hero_image' || key === 'profile_image' || key === 'logo_image') {
                     const imgEl = document.getElementById(key);
                     if(imgEl && value) {
-                        const newSrc = convertGDriveLink(value);
-                        if (imgEl.src !== newSrc) {
-                            imgEl.src = newSrc;
-                        }
+                        const urls = getGDriveUrls(value);
+                        setupImageFallback(imgEl, urls);
                     }
                 }
             }
@@ -462,12 +488,22 @@
                 card.className = "group bg-brand-deep rounded-2xl overflow-hidden border border-white/10 hover:border-brand-accent transition-all duration-300 block";
                 
                 const deleteBtnHtml = isAdmin ? `<button onclick="deleteReview(event, '${review.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full z-10 hover:bg-red-600"><i class="ph ph-trash"></i></button>` : '';
-                const safeImageUrl = convertGDriveLink(review.image);
+                
+                const urls = getGDriveUrls(review.image);
+                let srcAttr = '';
+                let errAttr = `onerror="this.src='https://via.placeholder.com/600x400?text=Image+Not+Found'"`;
+                
+                if (urls && urls.length > 1) {
+                    srcAttr = `src="${urls[0]}" data-urls='${JSON.stringify(urls)}' data-url-idx="0"`;
+                    errAttr = `onerror="let idx=parseInt(this.dataset.urlIdx)+1; let urls=JSON.parse(this.dataset.urls); if(idx<urls.length){this.dataset.urlIdx=idx; this.src=urls[idx];}else{this.src='https://via.placeholder.com/600x400?text=Image+Not+Found';}"`;
+                } else {
+                    srcAttr = `src="${urls ? urls[0] : review.image}"`;
+                }
 
                 card.innerHTML = `
                     <div class="relative h-48 overflow-hidden bg-gray-100">
                         ${deleteBtnHtml}
-                        <img src="${safeImageUrl}" alt="강의 사진" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100" onerror="this.src='https://via.placeholder.com/600x400?text=Image+Not+Found'" referrerpolicy="no-referrer">
+                        <img ${srcAttr} alt="강의 사진" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100" ${errAttr}>
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep to-transparent"></div>
                     </div>
                     <div class="p-6 relative -mt-6">
@@ -624,7 +660,8 @@
                             if(result.success && result.fileId) {
                                 const newUrl = `https://lh3.googleusercontent.com/d/${result.fileId}`;
                                 await saveSetting(imageId, newUrl);
-                                document.getElementById(imageId).src = newUrl;
+                                const urls = getGDriveUrls(newUrl);
+                                setupImageFallback(document.getElementById(imageId), urls);
                                 showToast("사진 업로드 및 적용 완료!");
                             } else {
                                 alert("업로드에 실패했습니다.");
@@ -644,8 +681,8 @@
                 
                 if(newSrc && newSrc !== currentSrc) {
                     await saveSetting(imageId, newSrc);
-                    const directImgUrl = convertGDriveLink(newSrc);
-                    document.getElementById(imageId).src = directImgUrl;
+                    const urls = getGDriveUrls(newSrc);
+                    setupImageFallback(document.getElementById(imageId), urls);
                 }
             }
         }
