@@ -132,9 +132,9 @@
                     </div>
                 </div>
                 <div class="md:w-1/2">
-                    <!-- 사용자가 업로드한 이미지를 적용하는 영역. 시스템 연동 전 임시 이미지 -->
-                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer" onclick="editImage('hero_image')">
-                        <img id="hero_image" src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80" alt="김병찬 대표 강의 모습" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <!-- 기본 이미지를 제거하고 로딩 전에는 회색 배경(bg-gray-200)이 보이도록 수정 -->
+                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer bg-gray-200" onclick="editImage('hero_image')">
+                        <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent flex items-end p-6">
                             <div class="text-white">
                                 <p class="font-bold text-xl">김병찬 대표</p>
@@ -231,8 +231,9 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-16 items-center">
                 <div class="md:w-5/12">
-                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl" onclick="editImage('profile_image')">
-                        <img id="profile_image" src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="김병찬 대표" class="w-full h-full object-cover">
+                    <!-- 기본 이미지를 제거하고 로딩 전에는 회색 배경(bg-gray-200)이 보이도록 수정 -->
+                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl bg-gray-200" onclick="editImage('profile_image')">
+                        <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <div class="md:w-7/12">
