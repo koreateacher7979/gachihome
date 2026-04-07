@@ -81,7 +81,7 @@
             <div class="flex justify-between items-center h-20">
                 <!-- 로고 영역 -->
                 <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <img id="logo_image" src="https://via.placeholder.com/40x40/E6F0FA/3B82F6?text=LOGO" alt="로고" class="h-10 w-auto object-contain rounded editable-image" onclick="event.stopPropagation(); editImage('logo_image')" title="로고 이미지">
+                    <img id="logo_image" src="https://via.placeholder.com/40x40/E6F0FA/3B82F6?text=LOGO" alt="로고" class="h-10 w-auto object-contain rounded editable-image" onclick="event.stopPropagation(); editImage('logo_image')" title="로고 이미지" referrerpolicy="no-referrer">
                     <span class="font-bold text-2xl text-brand-deep tracking-tight" data-editable="site_name">가치있는 <span class="text-brand-accent">미래교육</span> 연구소</span>
                 </div>
                 <!-- Desktop Menu -->
@@ -134,11 +134,11 @@
                         </a>
                     </div>
                 </div>
-                <div class="md:w-1/2">
-                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer editable-image" onclick="editImage('hero_image')">
-                        <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <div class="w-full md:w-1/2">
+                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer editable-image bg-gray-100" onclick="editImage('hero_image')">
+                        <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent flex items-end p-6">
-                            <div class="text-white">
+                            <div class="text-white relative z-10">
                                 <p class="font-bold text-xl">김병찬 대표</p>
                                 <p class="text-sm opacity-90">가치있는 미래교육 연구소</p>
                             </div>
@@ -232,9 +232,9 @@
     <section id="about" class="py-24 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-16 items-center">
-                <div class="md:w-5/12">
-                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image" onclick="editImage('profile_image')">
-                        <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="w-full h-full object-cover">
+                <div class="w-full md:w-5/12">
+                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image bg-gray-100" onclick="editImage('profile_image')">
+                        <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
                     </div>
                 </div>
                 <div class="md:w-7/12">
@@ -465,9 +465,9 @@
                 const safeImageUrl = convertGDriveLink(review.image);
 
                 card.innerHTML = `
-                    <div class="relative h-48 overflow-hidden">
+                    <div class="relative h-48 overflow-hidden bg-gray-100">
                         ${deleteBtnHtml}
-                        <img src="${safeImageUrl}" alt="강의 사진" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100" onerror="this.src='https://via.placeholder.com/600x400?text=Image+Not+Found'">
+                        <img src="${safeImageUrl}" alt="강의 사진" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100" onerror="this.src='https://via.placeholder.com/600x400?text=Image+Not+Found'" referrerpolicy="no-referrer">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep to-transparent"></div>
                     </div>
                     <div class="p-6 relative -mt-6">
