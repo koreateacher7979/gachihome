@@ -31,10 +31,9 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; scroll-behavior: smooth; }
         
-        /* 관리자 모드 스타일 */
+        /* 관리자 모드 스타일 - 모바일에서도 뚜렷하게 보이도록 개선 */
         .admin-mode [data-editable], .admin-mode .editable-image {
-            border: 2px dashed #f59e0b;
-            padding: 2px;
+            border: 3px dashed #f59e0b !important;
             cursor: pointer;
             position: relative;
             transition: all 0.2s;
@@ -42,19 +41,23 @@
         .admin-mode [data-editable]:hover, .admin-mode .editable-image:hover {
             background-color: rgba(245, 158, 11, 0.1);
         }
+        /* 안내 문구가 짤리지 않게 박스 안쪽으로 이동하고 항상 보이게(opacity: 0.9) 설정 */
         .admin-mode [data-editable]::after, .admin-mode .editable-image::after {
             content: '클릭하여 수정';
             position: absolute;
-            top: -25px;
-            right: 0;
+            top: 6px;
+            right: 6px;
             background: #f59e0b;
             color: white;
-            font-size: 12px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            opacity: 0;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 6px;
+            opacity: 0.9; 
             pointer-events: none;
             white-space: nowrap;
+            z-index: 50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .admin-mode [data-editable]:hover::after, .admin-mode .editable-image:hover::after { opacity: 1; }
         
@@ -233,6 +236,7 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-16 items-center">
                 <div class="w-full md:w-5/12">
+                    <!-- 프로필 사진 영역: 여기도 똑같이 클릭하면 직접 업로드가 작동합니다! -->
                     <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image bg-gray-100" onclick="editImage('profile_image')">
                         <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
                     </div>
