@@ -382,36 +382,35 @@
             return [url]; 
         }
 
-        // DOM onerror를 쓰지 않고 메모리 상에서 이미지를 안전하게 먼저 불러오는 핵심 우회 기술
+        // PC(웹) 크롬 보안 확장에 차단되지 않도록 HTML DOM 자체에서 직접 fallback을 시도하는 핵심 함수
         function loadImageRobustly(imgEl, urls) {
             if (!imgEl || !urls || urls.length === 0) return;
             
-            // 이미 성공적으로 불러온 이미지라면 중복 로딩(깜빡임) 방지
             if (imgEl.dataset.loadedUrl && urls.includes(imgEl.dataset.loadedUrl)) {
                 return;
             }
 
-            let idx = 0;
-            
-            function tryNext() {
-                if (idx >= urls.length) {
-                    // 모든 주소가 차단/실패했을 경우 에러 이미지 표시
-                    imgEl.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
-                    return;
+            imgEl.dataset.urls = JSON.stringify(urls);
+            imgEl.dataset.urlIdx = "0";
+
+            imgEl.onload = function() {
+                this.dataset.loadedUrl = this.src;
+                this.onerror = null; 
+            };
+
+            imgEl.onerror = function() {
+                let idx = parseInt(this.dataset.urlIdx) + 1;
+                let parsedUrls = JSON.parse(this.dataset.urls);
+                if (idx < parsedUrls.length) {
+                    this.dataset.urlIdx = idx.toString();
+                    this.src = parsedUrls[idx];
+                } else {
+                    this.onerror = null;
+                    this.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
                 }
-                const tempImg = new Image();
-                tempImg.referrerPolicy = "no-referrer"; // 모바일 차단 우회 핵심
-                tempImg.onload = () => {
-                    imgEl.src = tempImg.src;
-                    imgEl.dataset.loadedUrl = tempImg.src; // 성공한 주소 기억
-                };
-                tempImg.onerror = () => {
-                    idx++;
-                    tryNext(); // 실패하면 다음 우회 주소로 즉시 재시도
-                };
-                tempImg.src = urls[idx];
-            }
-            tryNext();
+            };
+
+            imgEl.src = urls[0];
         }
 
         // ==========================================
@@ -519,7 +518,7 @@
                 `;
                 container.appendChild(card);
                 
-                // 생성된 이미지 태그에 우회 로딩 시스템 개별 적용
+                // 생성된 DOM 태그에 직접 fallback 적용
                 loadImageRobustly(document.getElementById(imgId), urls);
             });
             container.classList.remove('hidden');
@@ -765,7 +764,7 @@
                 };
                 fileInput.click();
             } else {
-                let image = prompt("썸네일 이미지 URL (구글 드라이브 링크 가능):");
+                let image = prompt("썸네일 이미지 URL (구글 드라이브 링크/네이버 블로그 주소 등):");
                 if(!image) return;
                 saveReviewData(title, link, image);
             }
