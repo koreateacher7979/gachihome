@@ -338,17 +338,15 @@
         // 1. 설정 및 상태
         // ==========================================
         // ★ 중요: Code.gs를 배포한 후 발급받은 '웹앱 URL'을 아래에 붙여넣으세요.
-        // 비어있으면 임시 데모 데이터가 보입니다.
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
         const ADMIN_PASSWORD = "0330"; // 데모용 임시 비밀번호 (실제 사용시 변경 권장)
 
-        // 임시 데모 데이터 (GAS 연결 전 홈페이지를 렌더링하기 위함)
+        // 임시 데모 데이터
         const mockReviews = [
             { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" },
-            { id: 2, title: "생성형 AI 시대의 교사 리더십 워크숍", date: "2023.10.15", image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" },
-            { id: 3, title: "스마트 기기 활용 메타버스 교실 만들기", date: "2023.09.05", image: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
+            { id: 2, title: "생성형 AI 시대의 교사 리더십 워크숍", date: "2023.10.15", image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
         ];
 
         // ==========================================
@@ -370,8 +368,8 @@
             if (url.includes('drive.google.com') && match2 && match2[1]) fileId = match2[1];
 
             if (fileId) {
-                // 기존 uc?export=view 대신 drive.google.com/thumbnail 방식 사용 (핫링킹 차단 우회)
-                return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`; 
+                // CDN을 통한 가장 안정적인 구글 드라이브 이미지 핫링킹 방식 (공유권한 필수)
+                return `https://lh3.googleusercontent.com/d/${fileId}`; 
             }
             
             return url; // 일반 이미지 주소면 그대로 반환
@@ -401,19 +399,19 @@
             
             try {
                 if(!GAS_WEBAPP_URL) {
-                    console.log("GAS URL이 없어 임시 데이터를 로드합니다.");
                     renderReviews(mockReviews);
                     return;
                 }
 
-                // GAS에서 데이터 불러오기 (GET)
-                const response = await fetch(GAS_WEBAPP_URL + "?action=getData");
+                // ★ 중요: 브라우저가 과거 데이터를 기억(캐싱)하지 못하게 타임스탬프 강제 추가
+                const cacheBuster = new Date().getTime();
+                const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${cacheBuster}`;
+                
+                const response = await fetch(fetchUrl);
                 const data = await response.json();
                 
                 if(data.success) {
-                    // 설정 텍스트 적용
                     applySettings(data.settings);
-                    // 리뷰 카드 렌더링
                     renderReviews(data.reviews);
                 } else {
                     renderReviews(mockReviews);
@@ -437,7 +435,7 @@
                 if(key === 'hero_image' || key === 'profile_image') {
                     const imgEl = document.getElementById(key);
                     if(imgEl && value) {
-                        imgEl.src = convertGDriveLink(value); // 불러올 때도 안전하게 변환 적용
+                        imgEl.src = convertGDriveLink(value);
                     }
                 }
             }
@@ -489,7 +487,6 @@
                 const spinner = document.getElementById('submit-spinner');
                 const btnText = btn.querySelector('span');
                 
-                // 로딩 UI
                 btn.disabled = true;
                 btnText.innerText = "전송 중...";
                 spinner.classList.remove('hidden');
@@ -503,15 +500,7 @@
                     message: document.getElementById('contact_message').value
                 };
 
-                if(!GAS_WEBAPP_URL) {
-                    // 데모 시뮬레이션
-                    setTimeout(() => showSuccess(), 1000);
-                    return;
-                }
-
                 try {
-                    // no-cors mode를 쓰면 에러는 안나지만 response를 못읽음.
-                    // GAS에서 ContentType JSON으로 반환하도록 세팅됨.
                     const response = await fetch(GAS_WEBAPP_URL, {
                         method: "POST",
                         body: JSON.stringify(payload)
@@ -593,8 +582,7 @@
             let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 복사 등):", currentSrc);
             
             if(newSrc && newSrc !== currentSrc) {
-                // 구글 시트에는 입력받은 원본 링크(또는 이전 로직으로 변환된 링크)를 저장
-                // 화면에 표시할 때는 convertGDriveLink()를 거치도록 함
+                // 구글 시트에는 입력받은 원본 링크 저장
                 await saveSetting(imageId, newSrc);
                 
                 // 화면 즉각 반영 (썸네일 우회 링크 적용)
@@ -639,13 +627,6 @@
                 date: new Date().toLocaleDateString('ko-KR')
             };
 
-            if(!GAS_WEBAPP_URL) {
-                mockReviews.unshift({ id: Date.now(), ...payload });
-                renderReviews(mockReviews);
-                showToast("(데모) 리뷰 추가됨");
-                return;
-            }
-
             try {
                 showToast("리뷰 추가 중...");
                 const response = await fetch(GAS_WEBAPP_URL, {
@@ -666,14 +647,6 @@
             e.preventDefault();
             e.stopPropagation();
             if(!confirm("이 리뷰를 삭제하시겠습니까?")) return;
-
-            if(!GAS_WEBAPP_URL) {
-                const idx = mockReviews.findIndex(r => r.id == id);
-                if(idx > -1) mockReviews.splice(idx, 1);
-                renderReviews(mockReviews);
-                showToast("(데모) 리뷰 삭제됨");
-                return;
-            }
 
             try {
                 const response = await fetch(GAS_WEBAPP_URL, {
