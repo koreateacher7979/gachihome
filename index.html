@@ -352,6 +352,26 @@
         ];
 
         // ==========================================
+        // 유틸리티: 구글 드라이브 링크 변환 함수
+        // ==========================================
+        function convertGDriveLink(url) {
+            if (!url) return url;
+            // 구글 드라이브 공유 링크 패턴 1 (공유 링크 복사 시)
+            const regex1 = /\/file\/d\/([a-zA-Z0-9_-]+)/;
+            const match1 = url.match(regex1);
+            if (match1 && match1[1]) {
+                return `https://drive.google.com/uc?export=view&id=${match1[1]}`;
+            }
+            // 구글 드라이브 공유 링크 패턴 2 (상단 URL 복사 시)
+            const regex2 = /[?&]id=([a-zA-Z0-9_-]+)/;
+            const match2 = url.match(regex2);
+            if (url.includes('drive.google.com') && match2 && match2[1]) {
+                return `https://drive.google.com/uc?export=view&id=${match2[1]}`;
+            }
+            return url; // 일반 이미지 주소면 그대로 반환
+        }
+
+        // ==========================================
         // 2. 초기화 및 데이터 로딩
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
@@ -410,7 +430,9 @@
                 // 이미지 처리
                 if(key === 'hero_image' || key === 'profile_image') {
                     const imgEl = document.getElementById(key);
-                    if(imgEl && value) imgEl.src = value;
+                    if(imgEl && value) {
+                        imgEl.src = convertGDriveLink(value); // 불러올 때도 안전하게 변환 적용
+                    }
                 }
             }
         }
@@ -428,10 +450,13 @@
                 // 관리자 모드 시 삭제 버튼 추가 용도
                 const deleteBtnHtml = isAdmin ? `<button onclick="deleteReview(event, '${review.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full z-10 hover:bg-red-600"><i class="ph ph-trash"></i></button>` : '';
 
+                // 리뷰 이미지도 구글 드라이브 링크가 섞여 있을 수 있으니 변환 함수 통과
+                const safeImageUrl = convertGDriveLink(review.image);
+
                 card.innerHTML = `
                     <div class="relative h-48 overflow-hidden">
                         ${deleteBtnHtml}
-                        <img src="${review.image}" alt="강의 사진" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100" onerror="this.src='https://via.placeholder.com/600x400?text=Image+Not+Found'">
+                        <img src="${safeImageUrl}" alt="강의 사진" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100" onerror="this.src='https://via.placeholder.com/600x400?text=Image+Not+Found'">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep to-transparent"></div>
                     </div>
                     <div class="p-6 relative -mt-6">
@@ -559,11 +584,15 @@
         async function editImage(imageId) {
             if(!isAdmin) return;
             const currentSrc = document.getElementById(imageId).src;
-            const newSrc = prompt("새로운 이미지 URL을 입력하세요 (네이버 블로그 이미지 주소 복사 등):", currentSrc);
+            let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 복사 등):", currentSrc);
             
             if(newSrc && newSrc !== currentSrc) {
-                document.getElementById(imageId).src = newSrc;
-                await saveSetting(imageId, newSrc);
+                // 구글 드라이브 링크가 입력되었을 경우 다운로드용 직접 링크로 변환
+                const directImgUrl = convertGDriveLink(newSrc);
+                
+                document.getElementById(imageId).src = directImgUrl;
+                // 구글 시트에는 변환된 직접 주소를 저장
+                await saveSetting(imageId, directImgUrl);
             }
         }
 
@@ -592,8 +621,11 @@
             if(!title) return;
             const link = prompt("네이버 블로그 링크 URL:");
             if(!link) return;
-            const image = prompt("썸네일 이미지 URL:");
+            let image = prompt("썸네일 이미지 URL (구글 드라이브 링크 가능):");
             if(!image) return;
+
+            // 추가할 때 썸네일 이미지도 구글 드라이브 링크 변환 로직 적용
+            image = convertGDriveLink(image);
 
             const payload = {
                 action: "addReview",
