@@ -92,6 +92,7 @@
                     <a href="#about" class="text-gray-600 hover:text-brand-accent font-medium">프로필</a>
                     <a href="#services" class="text-gray-600 hover:text-brand-accent font-medium">전문 분야</a>
                     <a href="#reviews" class="text-gray-600 hover:text-brand-accent font-medium">강의 후기</a>
+                    <a href="#sharing" class="text-gray-600 hover:text-brand-accent font-medium">무료 나눔</a>
                     <a href="#contact" class="bg-brand-deep text-white px-5 py-2 rounded-full hover:bg-blue-800 transition font-medium">강의 의뢰</a>
                 </div>
                 <!-- Mobile Menu Button -->
@@ -108,6 +109,7 @@
                 <a href="#about" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">프로필</a>
                 <a href="#services" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">전문 분야</a>
                 <a href="#reviews" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">강의 후기</a>
+                <a href="#sharing" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">무료 나눔</a>
                 <a href="#contact" class="block px-3 py-2 text-brand-accent font-bold hover:bg-gray-50 rounded-md">강의 의뢰</a>
             </div>
         </div>
@@ -197,7 +199,7 @@
         </div>
     </section>
 
-    <!-- Review Showcase (Dynamic Block) -->
+    <!-- Review Showcase -->
     <section id="reviews" class="py-24 bg-brand-deep text-white">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/20 pb-6">
@@ -217,15 +219,44 @@
                 <i class="ph ph-spinner-gap animate-spin text-4xl text-brand-accent"></i>
             </div>
 
-            <!-- Reviews Grid (Populated by JS) -->
+            <!-- Reviews Grid -->
             <div id="reviews-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
                 <!-- Review Cards will be injected here -->
             </div>
             
-            <!-- 관리자 모드 시 나타나는 후기 추가 버튼 -->
+            <!-- 관리자 모드 시 나타나는 버튼 -->
             <div id="admin-add-review" class="hidden mt-10 text-center">
                 <button onclick="addReviewPrompt()" class="bg-brand-accent/20 border border-brand-accent text-white px-6 py-3 rounded-lg hover:bg-brand-accent transition flex items-center justify-center gap-2 mx-auto">
                     <i class="ph ph-plus-circle"></i> 새로운 리뷰 추가하기 (시트에 반영)
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Free Sharing Section (신규 추가된 자료실) -->
+    <section id="sharing" class="py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-brand-deep mb-3">무료 나눔 자료실</h2>
+                    <p class="text-gray-600">제가 직접 기획하고 제작한 유용한 교육용 프로그램과 자료를 나눕니다.</p>
+                </div>
+            </div>
+
+            <!-- Loader -->
+            <div id="sharing-loader" class="flex justify-center py-12">
+                <i class="ph ph-spinner-gap animate-spin text-4xl text-brand-accent"></i>
+            </div>
+
+            <!-- Sharing Grid -->
+            <div id="sharing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 hidden">
+                <!-- Sharing Cards will be injected here -->
+            </div>
+            
+            <!-- 관리자 모드 시 나타나는 버튼 -->
+            <div id="admin-add-sharing" class="hidden mt-10 text-center">
+                <button onclick="addSharingPrompt()" class="bg-white border-2 border-brand-accent text-brand-accent px-6 py-3 rounded-lg hover:bg-brand-accent hover:text-white transition flex items-center justify-center gap-2 mx-auto font-bold shadow-sm">
+                    <i class="ph ph-plus-circle text-xl"></i> 새로운 나눔 자료 등록하기
                 </button>
             </div>
         </div>
@@ -236,7 +267,6 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-16 items-center">
                 <div class="w-full md:w-5/12">
-                    <!-- 프로필 사진 영역: 여기도 똑같이 클릭하면 직접 업로드가 작동합니다! -->
                     <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image bg-gray-100" onclick="editImage('profile_image')">
                         <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
                     </div>
@@ -350,11 +380,17 @@
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
-        const ADMIN_PASSWORD = "0330"; 
+        let ADMIN_PASSWORD = "0330"; // 시트에서 가져오는 기본값 (변경됨)
 
         const mockReviews = [
             { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" },
             { id: 2, title: "생성형 AI 시대의 교사 리더십 워크숍", date: "2023.10.15", image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
+        ];
+
+        // 나눔 자료 데모 데이터
+        const mockSharing = [
+            { id: 1, title: "업무 자동화 구글 시트", description: "클릭 한 번으로 보고서를 생성하는 구글 시트 템플릿입니다. 사본 만들기로 가져가세요.", date: "2024.04.15", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", fileUrl: "#" },
+            { id: 2, title: "생성형 AI 프롬프트북", description: "수업 및 행정 업무에 바로 복사해서 쓸 수 있는 상황별 프롬프트 예시 모음집(PDF)입니다.", date: "2024.04.10", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80", fileUrl: "#" }
         ];
 
         // ==========================================
@@ -378,15 +414,14 @@
 
             if (fileId) {
                 return [
-                    `https://lh3.googleusercontent.com/d/${fileId}`, // 1순위: 데스크탑용 고속 CDN
-                    `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, // 2순위: 모바일 우회용 썸네일 API
-                    `https://drive.google.com/uc?export=view&id=${fileId}` // 3순위: 기본 예전 방식
+                    `https://lh3.googleusercontent.com/d/${fileId}`, 
+                    `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, 
+                    `https://drive.google.com/uc?export=view&id=${fileId}` 
                 ];
             }
             return [url]; 
         }
 
-        // PC(웹) 크롬 보안 확장에 차단되지 않도록 HTML DOM 자체에서 직접 fallback을 시도하는 핵심 함수
         function loadImageRobustly(imgEl, urls) {
             if (!imgEl || !urls || urls.length === 0) return;
             
@@ -436,21 +471,25 @@
         }
 
         async function loadData() {
-            const loader = document.getElementById('reviews-loader');
-            const container = document.getElementById('reviews-container');
+            const loaderR = document.getElementById('reviews-loader');
+            const containerR = document.getElementById('reviews-container');
+            const loaderS = document.getElementById('sharing-loader');
+            const containerS = document.getElementById('sharing-container');
             
             const cachedData = localStorage.getItem('kbc_site_data');
             if(cachedData) {
                 try {
                     const parsed = JSON.parse(cachedData);
+                    if(parsed.adminPassword) ADMIN_PASSWORD = parsed.adminPassword.toString();
                     applySettings(parsed.settings);
                     renderReviews(parsed.reviews);
+                    if(parsed.sharing) renderSharing(parsed.sharing);
                 } catch(e) { console.error("캐시 파싱 오류", e); }
             }
 
             try {
                 if(!GAS_WEBAPP_URL) {
-                    if(!cachedData) renderReviews(mockReviews);
+                    if(!cachedData) { renderReviews(mockReviews); renderSharing(mockSharing); }
                     return;
                 }
 
@@ -462,17 +501,22 @@
                 
                 if(data.success) {
                     localStorage.setItem('kbc_site_data', JSON.stringify(data));
+                    if(data.adminPassword) ADMIN_PASSWORD = data.adminPassword.toString();
                     applySettings(data.settings);
                     renderReviews(data.reviews);
+                    if(data.sharing) renderSharing(data.sharing);
                 } else if(!cachedData) {
                     renderReviews(mockReviews);
+                    renderSharing(mockSharing);
                 }
             } catch (error) {
                 console.error("데이터 로드 실패:", error);
-                if(!cachedData) renderReviews(mockReviews);
+                if(!cachedData) { renderReviews(mockReviews); renderSharing(mockSharing); }
             } finally {
-                loader.classList.add('hidden');
-                container.classList.remove('hidden');
+                loaderR.classList.add('hidden');
+                containerR.classList.remove('hidden');
+                loaderS.classList.add('hidden');
+                containerS.classList.remove('hidden');
             }
         }
 
@@ -521,11 +565,41 @@
                     </div>
                 `;
                 container.appendChild(card);
-                
-                // 생성된 DOM 태그에 직접 fallback 적용
                 loadImageRobustly(document.getElementById(imgId), urls);
             });
-            container.classList.remove('hidden');
+        }
+
+        // 새롭게 추가된 무료 나눔 렌더링 함수
+        function renderSharing(items) {
+            const container = document.getElementById('sharing-container');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col relative";
+                
+                const deleteBtnHtml = isAdmin ? `<button onclick="deleteSharing(event, '${item.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full z-10 hover:bg-red-600"><i class="ph ph-trash"></i></button>` : '';
+                
+                const urls = getGDriveUrls(item.image);
+                const imgId = `share_img_${item.id}`;
+
+                card.innerHTML = `
+                    ${deleteBtnHtml}
+                    <div class="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
+                        <img id="${imgId}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="자료 이미지" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <span class="text-brand-accent text-xs font-semibold mb-2 block">${item.date}</span>
+                        <h3 class="text-xl font-bold text-brand-deep mb-2 line-clamp-1">${item.title}</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow line-clamp-2">${item.description}</p>
+                        <a href="${item.fileUrl}" target="_blank" class="w-full text-center bg-brand-light text-brand-accent font-bold py-2.5 rounded-lg hover:bg-brand-accent hover:text-white transition flex items-center justify-center gap-2">
+                            <i class="ph ph-download-simple text-lg"></i> 다운로드 / 열기
+                        </a>
+                    </div>
+                `;
+                container.appendChild(card);
+                loadImageRobustly(document.getElementById(imgId), urls);
+            });
         }
 
         // ==========================================
@@ -589,6 +663,7 @@
                 isAdmin = false;
                 document.body.classList.remove('admin-mode');
                 document.getElementById('admin-add-review').classList.add('hidden');
+                document.getElementById('admin-add-sharing').classList.add('hidden');
                 showToast("관리자 모드가 종료되었습니다.");
                 loadData(); 
             } else {
@@ -597,6 +672,7 @@
                     isAdmin = true;
                     document.body.classList.add('admin-mode');
                     document.getElementById('admin-add-review').classList.remove('hidden');
+                    document.getElementById('admin-add-sharing').classList.remove('hidden');
                     setupEditableElements();
                     showToast("관리자 모드 활성화 됨. 텍스트를 클릭하여 수정하세요.");
                     loadData(); 
@@ -634,7 +710,6 @@
             const choice = confirm("PC/스마트폰에 있는 '사진 파일'을 직접 업로드 하시겠습니까?\n(취소를 누르면 기존처럼 링크를 입력합니다.)");
             
             if (choice) {
-                // 파일 업로드
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
                 fileInput.accept = 'image/*';
@@ -642,29 +717,17 @@
                 fileInput.onchange = async e => {
                     const file = e.target.files[0];
                     if(!file) return;
-                    
-                    if(file.size > 5 * 1024 * 1024) { 
-                        alert("이미지 용량이 너무 큽니다. 5MB 이하의 사진을 선택해주세요.");
-                        return;
-                    }
+                    if(file.size > 5 * 1024 * 1024) { alert("이미지 용량이 너무 큽니다. 5MB 이하의 사진을 선택해주세요."); return; }
 
                     const reader = new FileReader();
                     reader.onload = async function(event) {
                         const base64Data = event.target.result.split(',')[1];
-                        
                         showToast("사진을 서버로 업로드 중입니다. 잠시만 기다려주세요...");
-                        
                         try {
                             const response = await fetch(GAS_WEBAPP_URL, {
                                 method: "POST",
-                                body: JSON.stringify({
-                                    action: "uploadImage",
-                                    filename: file.name,
-                                    mimeType: file.type,
-                                    data: base64Data
-                                })
+                                body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type, data: base64Data })
                             });
-                            
                             const result = await response.json();
                             if(result.success && result.fileId) {
                                 const newUrl = `https://lh3.googleusercontent.com/d/${result.fileId}`;
@@ -676,7 +739,6 @@
                                 alert("업로드에 실패했습니다.");
                             }
                         } catch(err) {
-                            console.error(err);
                             alert("업로드 중 통신 오류가 발생했습니다.");
                         }
                     };
@@ -684,10 +746,8 @@
                 };
                 fileInput.click();
             } else {
-                // 기존 링크 입력
                 const currentSrc = document.getElementById(imageId).src;
-                let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 복사 등):", currentSrc);
-                
+                let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 등):", currentSrc);
                 if(newSrc && newSrc !== currentSrc) {
                     await saveSetting(imageId, newSrc);
                     const urls = getGDriveUrls(newSrc);
@@ -701,13 +761,9 @@
                 showToast(`(데모) ${key} 저장됨`);
                 return;
             }
-            
             try {
                 showToast("저장 중...");
-                const response = await fetch(GAS_WEBAPP_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "updateSetting", key: key, value: value })
-                });
+                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "updateSetting", key: key, value: value }) });
                 const result = await response.json();
                 if(result.success) showToast("저장 완료!");
                 else showToast("저장 실패");
@@ -716,6 +772,101 @@
             }
         }
 
+        // ==========================================
+        // 무료 나눔 업로드 프롬프트
+        // ==========================================
+        async function addSharingPrompt() {
+            const title = prompt("무료 나눔 제목을 입력하세요:");
+            if(!title) return;
+            const desc = prompt("자료에 대한 간단한 설명을 입력하세요:");
+            if(!desc) return;
+            
+            let image = "";
+            const imgChoice = confirm("썸네일 사진을 파일로 직접 업로드 하시겠습니까?\n(취소 클릭 시 구글 드라이브 링크 직접 입력)");
+            if (imgChoice) {
+                image = await new Promise((resolve) => {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = 'image/*';
+                    fileInput.onchange = async e => {
+                        const file = e.target.files[0];
+                        if(!file) { resolve(""); return; }
+                        if(file.size > 5 * 1024 * 1024) { alert("5MB 이하만 가능합니다."); resolve(""); return; }
+                        const reader = new FileReader();
+                        reader.onload = async function(event) {
+                            showToast("썸네일 이미지 업로드 중...");
+                            try {
+                                const res = await fetch(GAS_WEBAPP_URL, {
+                                    method: "POST",
+                                    body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type, data: event.target.result.split(',')[1] })
+                                });
+                                const r = await res.json();
+                                resolve(r.success && r.fileId ? `https://lh3.googleusercontent.com/d/${r.fileId}` : "");
+                            } catch(err) { alert("통신 오류"); resolve(""); }
+                        };
+                        reader.readAsDataURL(file);
+                    };
+                    fileInput.click();
+                });
+            } else {
+                image = prompt("썸네일 이미지 URL (구글 드라이브 링크 등):");
+            }
+            if(!image) return;
+
+            let fileUrl = "";
+            const fileChoice = confirm("공유할 '프로그램/자료'를 직접 업로드 하시겠습니까?\n(10MB 이하 권장. 취소 클릭 시 구글 드라이브 다운로드 링크 직접 입력)");
+            if (fileChoice) {
+                fileUrl = await new Promise((resolve) => {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.onchange = async e => {
+                        const file = e.target.files[0];
+                        if(!file) { resolve(""); return; }
+                        if(file.size > 15 * 1024 * 1024) { alert("용량 초과! 큰 파일은 구글 드라이브에 올린 후 직접 링크를 입력해주세요."); resolve(""); return; }
+                        const reader = new FileReader();
+                        reader.onload = async function(event) {
+                            showToast(`'${file.name}' 업로드 중...`);
+                            try {
+                                const res = await fetch(GAS_WEBAPP_URL, {
+                                    method: "POST",
+                                    body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type || "application/octet-stream", data: event.target.result.split(',')[1] })
+                                });
+                                const r = await res.json();
+                                resolve(r.success && r.fileId ? `https://drive.google.com/uc?export=download&id=${r.fileId}` : "");
+                            } catch(err) { alert("통신 오류"); resolve(""); }
+                        };
+                        reader.readAsDataURL(file);
+                    };
+                    fileInput.click();
+                });
+            } else {
+                fileUrl = prompt("공유할 파일의 다운로드 링크를 입력하세요:");
+            }
+            if(!fileUrl) return;
+
+            const payload = { action: "addSharing", title: title, description: desc, image: image, fileUrl: fileUrl, date: new Date().toLocaleDateString('ko-KR') };
+            try {
+                showToast("자료 추가 중...");
+                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify(payload) });
+                const result = await response.json();
+                if(result.success) { showToast("추가 완료!"); loadData(); }
+            } catch(e) { showToast("추가 실패"); }
+        }
+
+        async function deleteSharing(e, id) {
+            e.preventDefault();
+            e.stopPropagation();
+            if(!confirm("이 나눔 자료를 삭제하시겠습니까?")) return;
+            try {
+                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "deleteSharing", id: id }) });
+                const result = await response.json();
+                if(result.success) { showToast("삭제 완료"); loadData(); }
+            } catch(e) { showToast("삭제 실패"); }
+        }
+
+        // ==========================================
+        // 기존 리뷰 업로드 프롬프트
+        // ==========================================
         async function addReviewPrompt() {
             const title = prompt("리뷰 제목:");
             if(!title) return;
@@ -732,37 +883,22 @@
                 fileInput.onchange = async e => {
                     const file = e.target.files[0];
                     if(!file) return;
-                    
-                    if(file.size > 5 * 1024 * 1024) {
-                        alert("이미지 용량은 5MB 이하여야 합니다.");
-                        return;
-                    }
+                    if(file.size > 5 * 1024 * 1024) { alert("이미지 용량은 5MB 이하여야 합니다."); return; }
 
                     const reader = new FileReader();
                     reader.onload = async function(event) {
-                        const base64Data = event.target.result.split(',')[1];
-                        
                         showToast("리뷰 이미지 업로드 중...");
                         try {
                             const response = await fetch(GAS_WEBAPP_URL, {
                                 method: "POST",
-                                body: JSON.stringify({
-                                    action: "uploadImage",
-                                    filename: file.name,
-                                    mimeType: file.type,
-                                    data: base64Data
-                                })
+                                body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type, data: event.target.result.split(',')[1] })
                             });
                             const result = await response.json();
                             if(result.success && result.fileId) {
                                 const newUrl = `https://lh3.googleusercontent.com/d/${result.fileId}`;
                                 saveReviewData(title, link, newUrl);
-                            } else {
-                                alert("이미지 업로드 실패");
-                            }
-                        } catch(err) {
-                            alert("업로드 통신 오류");
-                        }
+                            } else { alert("이미지 업로드 실패"); }
+                        } catch(err) { alert("업로드 통신 오류"); }
                     };
                     reader.readAsDataURL(file);
                 };
@@ -775,48 +911,24 @@
         }
 
         async function saveReviewData(title, link, image) {
-            const payload = {
-                action: "addReview",
-                title: title,
-                link: link,
-                image: image, 
-                date: new Date().toLocaleDateString('ko-KR')
-            };
-
+            const payload = { action: "addReview", title: title, link: link, image: image, date: new Date().toLocaleDateString('ko-KR') };
             try {
                 showToast("리뷰 추가 중...");
-                const response = await fetch(GAS_WEBAPP_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
+                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify(payload) });
                 const result = await response.json();
-                if(result.success) {
-                    showToast("리뷰 추가 완료!");
-                    loadData(); 
-                }
-            } catch(e) {
-                showToast("리뷰 추가 실패");
-            }
+                if(result.success) { showToast("리뷰 추가 완료!"); loadData(); }
+            } catch(e) { showToast("리뷰 추가 실패"); }
         }
 
         async function deleteReview(e, id) {
             e.preventDefault();
             e.stopPropagation();
             if(!confirm("이 리뷰를 삭제하시겠습니까?")) return;
-
             try {
-                const response = await fetch(GAS_WEBAPP_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "deleteReview", id: id })
-                });
+                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "deleteReview", id: id }) });
                 const result = await response.json();
-                if(result.success) {
-                    showToast("삭제 완료");
-                    loadData();
-                }
-            } catch(e) {
-                showToast("삭제 실패");
-            }
+                if(result.success) { showToast("삭제 완료"); loadData(); }
+            } catch(e) { showToast("삭제 실패"); }
         }
 
         function showToast(msg) {
@@ -825,7 +937,6 @@
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
     </script>
 </body>
 </html>
