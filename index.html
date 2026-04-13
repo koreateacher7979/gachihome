@@ -290,6 +290,7 @@
                 <div class="text-brand-accent text-sm font-semibold" id="modal-date"></div>
                 <h2 class="text-2xl font-bold text-brand-deep leading-tight" id="modal-title"></h2>
                 
+                <!-- 본문 (링크 자동 변환 적용) -->
                 <div class="text-gray-700 leading-relaxed whitespace-pre-wrap mt-2" id="modal-desc"></div>
                 
                 <div class="mt-6 pt-6 border-t border-gray-100">
@@ -420,7 +421,7 @@
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
-        let ADMIN_PASSWORD = "1004"; // 만약 서버 통신에 실패하더라도 1004가 기본값이 되도록 수정
+        let ADMIN_PASSWORD = "1004"; // 만약 서버 통신에 실패하더라도 1004가 기본값이 되도록 설정
 
         const mockReviews = [
             { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" },
@@ -429,7 +430,7 @@
 
         const mockSharing = [
             { id: 1, title: "업무 자동화 구글 시트", description: "클릭 한 번으로 보고서를 생성하는 구글 시트 템플릿입니다.\n사본 만들기로 가져가세요.", date: "2024.04.15", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", fileUrl: "#" },
-            { id: 2, title: "생성형 AI 프롬프트북", description: "수업 및 행정 업무에 바로 복사해서 쓸 수 있는 상황별 프롬프트 예시 모음집(PDF)입니다.", date: "2024.04.10", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80", fileUrl: "#" }
+            { id: 2, title: "생성형 AI 프롬프트북", description: "수업 및 행정 업무에 바로 복사해서 쓸 수 있는 상황별 프롬프트 예시 모음집(PDF)입니다.\n\n예시 링크: https://google.com", date: "2024.04.10", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80", fileUrl: "#" }
         ];
         
         // 상세 내용을 띄우기 위해 데이터를 전역 변수로 저장해둡니다.
@@ -663,15 +664,28 @@
         }
 
         // ==========================================
-        // 팝업(모달) 창 제어 함수
+        // 팝업(모달) 창 제어 함수 및 링크 변환 처리
         // ==========================================
+        function linkify(text) {
+            if (!text) return '';
+            // 텍스트 속의 URL 주소를 찾아 클릭 가능한 HTML 태그로 바꿔주는 정규식
+            var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            return text.replace(urlRegex, function(url) {
+                return '<a href="' + url + '" target="_blank" class="text-brand-accent font-bold hover:underline break-all">' + url + '</a>';
+            });
+        }
+
         function openSharingModal(id) {
             const item = window.sharingData.find(x => x.id.toString() === id.toString());
             if(!item) return;
 
             document.getElementById('modal-title').innerText = item.title;
             document.getElementById('modal-date').innerText = item.date;
-            document.getElementById('modal-desc').innerText = item.description;
+            
+            // 링크 변환 및 줄바꿈 처리 적용 후 본문에 렌더링
+            const formattedDesc = linkify(item.description);
+            document.getElementById('modal-desc').innerHTML = formattedDesc;
+            
             document.getElementById('modal-link').href = item.fileUrl;
             
             const modalImg = document.getElementById('modal-image');
