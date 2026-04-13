@@ -233,7 +233,7 @@
         </div>
     </section>
 
-    <!-- Free Sharing Section (신규 추가된 자료실) -->
+    <!-- Free Sharing Section -->
     <section id="sharing" class="py-24 bg-white">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
@@ -453,7 +453,7 @@
         }
 
         // ==========================================
-        // 2. 초기화 및 데이터 로딩 (캐시 적용)
+        // 2. 초기화 및 데이터 로딩
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             initMobileMenu();
@@ -468,6 +468,23 @@
             menu.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => menu.classList.add('hidden'));
             });
+        }
+
+        async function fetchAdminPassword() {
+            try {
+                // 캐시 우회를 위해 타임스탬프 추가
+                const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${new Date().getTime()}`;
+                const response = await fetch(fetchUrl);
+                const data = await response.json();
+                
+                if (data.success && data.adminPassword) {
+                    ADMIN_PASSWORD = data.adminPassword.toString();
+                    return ADMIN_PASSWORD;
+                }
+            } catch (e) {
+                console.error("비밀번호 로드 실패", e);
+            }
+            return null;
         }
 
         async function loadData() {
@@ -569,7 +586,6 @@
             });
         }
 
-        // 새롭게 추가된 무료 나눔 렌더링 함수
         function renderSharing(items) {
             const container = document.getElementById('sharing-container');
             container.innerHTML = '';
@@ -658,7 +674,7 @@
         // ==========================================
         // 4. 관리자 모드 (No-Code Admin) 및 파일 직접 업로드
         // ==========================================
-        function toggleAdminMode() {
+        async function toggleAdminMode() {
             if(isAdmin) {
                 isAdmin = false;
                 document.body.classList.remove('admin-mode');
@@ -668,7 +684,12 @@
                 loadData(); 
             } else {
                 const pwd = prompt("관리자 비밀번호를 입력하세요:");
-                if(pwd === ADMIN_PASSWORD) {
+                if (pwd === null) return; // 취소 버튼 클릭 시
+                
+                showToast("인증 확인 중...");
+                const latestPass = await fetchAdminPassword(); // 서버에서 최신 비밀번호 강제 확인
+
+                if(pwd === (latestPass || ADMIN_PASSWORD)) {
                     isAdmin = true;
                     document.body.classList.add('admin-mode');
                     document.getElementById('admin-add-review').classList.remove('hidden');
@@ -676,8 +697,8 @@
                     setupEditableElements();
                     showToast("관리자 모드 활성화 됨. 텍스트를 클릭하여 수정하세요.");
                     loadData(); 
-                } else if(pwd) {
-                    alert("비밀번호가 틀렸습니다.");
+                } else {
+                    alert("비밀번호가 일치하지 않습니다.");
                 }
             }
         }
