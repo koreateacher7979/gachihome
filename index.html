@@ -297,7 +297,7 @@
                     <a id="modal-link" href="#" target="_blank" class="w-full text-center bg-brand-accent text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition flex items-center justify-center gap-2 shadow-md">
                         <i class="ph ph-download-simple text-xl"></i> 파일 다운로드 및 열기
                     </a>
-                    <p class="text-xs text-gray-400 text-center mt-3">안전한 구글 드라이브 링크로 연결됩니다.</p>
+                    <p class="text-xs text-gray-400 text-center mt-3">안전한 다운로드 링크 또는 관련 페이지로 연결됩니다.</p>
                 </div>
             </div>
         </div>
@@ -419,7 +419,7 @@
         // 1. 설정 및 상태
         // ==========================================
         // ★ 필수 확인: 아래 따옴표 안의 주소가 대표님의 웹 앱 URL인지 반드시 다시 확인해주세요! ★
-        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw_ZOOxmZMjJRMkrGPkY9iQcIZDXtfe6zgN4dbhJyzT4nrl2VTpbT0ESVT_Fkhs1NA/exec"; 
+        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
         let ADMIN_PASSWORD = "1004"; 
@@ -653,7 +653,8 @@
         // ==========================================
         function linkify(text) {
             if (!text) return '';
-            var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            // 한글 및 특수문자가 포함된 주소도 인식할 수 있도록 정규식 대폭 개선
+            var urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/ig;
             return text.replace(urlRegex, function(url) {
                 return '<a href="' + url + '" target="_blank" class="text-brand-accent font-bold hover:underline break-all">' + url + '</a>';
             });
