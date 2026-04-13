@@ -418,22 +418,20 @@
         // ==========================================
         // 1. 설정 및 상태
         // ==========================================
+        // ★ 필수 확인: 아래 따옴표 안의 주소가 대표님의 웹 앱 URL인지 반드시 다시 확인해주세요! ★
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
-        let ADMIN_PASSWORD = "1004"; // 만약 서버 통신에 실패하더라도 1004가 기본값이 되도록 설정
+        let ADMIN_PASSWORD = "1004"; 
 
         const mockReviews = [
-            { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" },
-            { id: 2, title: "생성형 AI 시대의 교사 리더십 워크숍", date: "2023.10.15", image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
+            { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
         ];
 
         const mockSharing = [
-            { id: 1, title: "업무 자동화 구글 시트", description: "클릭 한 번으로 보고서를 생성하는 구글 시트 템플릿입니다.\n사본 만들기로 가져가세요.", date: "2024.04.15", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", fileUrl: "#" },
-            { id: 2, title: "생성형 AI 프롬프트북", description: "수업 및 행정 업무에 바로 복사해서 쓸 수 있는 상황별 프롬프트 예시 모음집(PDF)입니다.\n\n예시 링크: https://google.com", date: "2024.04.10", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80", fileUrl: "#" }
+            { id: 1, title: "가치있는 미래교육 자료실", description: "아직 시트와 연결되지 않았습니다. Apps Script 주소를 확인해주세요.", date: "2024.04.15", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", fileUrl: "#" }
         ];
         
-        // 상세 내용을 띄우기 위해 데이터를 전역 변수로 저장해둡니다.
         window.sharingData = [];
 
         // ==========================================
@@ -441,7 +439,6 @@
         // ==========================================
         function getGDriveUrls(url) {
             if (!url) return null;
-            
             let fileId = null;
             const regex1 = /\/file\/d\/([a-zA-Z0-9_-]+)/;
             const match1 = url.match(regex1);
@@ -467,10 +464,7 @@
 
         function loadImageRobustly(imgEl, urls) {
             if (!imgEl || !urls || urls.length === 0) return;
-            
-            if (imgEl.dataset.loadedUrl && urls.includes(imgEl.dataset.loadedUrl)) {
-                return;
-            }
+            if (imgEl.dataset.loadedUrl && urls.includes(imgEl.dataset.loadedUrl)) return;
 
             imgEl.dataset.urls = JSON.stringify(urls);
             imgEl.dataset.urlIdx = "0";
@@ -491,12 +485,11 @@
                     this.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
                 }
             };
-
             imgEl.src = urls[0];
         }
 
         // ==========================================
-        // 2. 초기화 및 데이터 로딩
+        // 2. 초기화 및 데이터 로딩 (캐시 무시 강력 새로고침)
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             initMobileMenu();
@@ -520,7 +513,7 @@
                 const data = await response.json();
                 
                 if (data.success && data.adminPassword) {
-                    ADMIN_PASSWORD = data.adminPassword.toString().trim(); // 여백 방지
+                    ADMIN_PASSWORD = data.adminPassword.toString().trim(); 
                     return ADMIN_PASSWORD;
                 }
             } catch (e) {
@@ -529,29 +522,21 @@
             return null;
         }
 
+        // 브라우저의 과거 캐시를 완전히 무시하고 항상 시트에서 최신 데이터를 가져옵니다.
         async function loadData() {
             const loaderR = document.getElementById('reviews-loader');
             const containerR = document.getElementById('reviews-container');
             const loaderS = document.getElementById('sharing-loader');
             const containerS = document.getElementById('sharing-container');
-            
-            const cachedData = localStorage.getItem('kbc_site_data');
-            if(cachedData) {
-                try {
-                    const parsed = JSON.parse(cachedData);
-                    if(parsed.adminPassword) ADMIN_PASSWORD = parsed.adminPassword.toString().trim();
-                    applySettings(parsed.settings);
-                    renderReviews(parsed.reviews);
-                    if(parsed.sharing) renderSharing(parsed.sharing);
-                } catch(e) { console.error("캐시 파싱 오류", e); }
-            }
 
             try {
-                if(!GAS_WEBAPP_URL) {
-                    if(!cachedData) { renderReviews(mockReviews); renderSharing(mockSharing); }
+                if(!GAS_WEBAPP_URL || GAS_WEBAPP_URL === "") {
+                    renderReviews(mockReviews); 
+                    renderSharing(mockSharing);
                     return;
                 }
 
+                // 타임스탬프를 붙여 브라우저 캐싱을 원천 차단
                 const cacheBuster = new Date().getTime();
                 const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${cacheBuster}`;
                 
@@ -559,18 +544,20 @@
                 const data = await response.json();
                 
                 if(data.success) {
-                    localStorage.setItem('kbc_site_data', JSON.stringify(data));
                     if(data.adminPassword) ADMIN_PASSWORD = data.adminPassword.toString().trim();
                     applySettings(data.settings);
-                    renderReviews(data.reviews);
-                    if(data.sharing) renderSharing(data.sharing);
-                } else if(!cachedData) {
+                    
+                    // 데이터가 배열 형태로 오는지 안전하게 확인 후 렌더링
+                    renderReviews(data.reviews || []);
+                    renderSharing(data.sharing || []);
+                } else {
                     renderReviews(mockReviews);
                     renderSharing(mockSharing);
                 }
             } catch (error) {
                 console.error("데이터 로드 실패:", error);
-                if(!cachedData) { renderReviews(mockReviews); renderSharing(mockSharing); }
+                renderReviews(mockReviews); 
+                renderSharing(mockSharing);
             } finally {
                 loaderR.classList.add('hidden');
                 containerR.classList.remove('hidden');
@@ -628,15 +615,13 @@
             });
         }
 
-        // 썸네일과 제목만 표시되는 새로운 카드 디자인 + 모달 팝업 연결
         function renderSharing(items) {
-            window.sharingData = items; // 모달창에 데이터를 전달하기 위해 전역으로 저장
+            window.sharingData = items; 
             const container = document.getElementById('sharing-container');
             container.innerHTML = '';
             
             items.forEach(item => {
                 const card = document.createElement('div');
-                // 클릭하면 상세정보 모달창이 열리게 설정
                 card.className = "group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 relative flex flex-col cursor-pointer";
                 card.onclick = () => openSharingModal(item.id);
                 
@@ -668,7 +653,6 @@
         // ==========================================
         function linkify(text) {
             if (!text) return '';
-            // 텍스트 속의 URL 주소를 찾아 클릭 가능한 HTML 태그로 바꿔주는 정규식
             var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
             return text.replace(urlRegex, function(url) {
                 return '<a href="' + url + '" target="_blank" class="text-brand-accent font-bold hover:underline break-all">' + url + '</a>';
@@ -682,7 +666,6 @@
             document.getElementById('modal-title').innerText = item.title;
             document.getElementById('modal-date').innerText = item.date;
             
-            // 링크 변환 및 줄바꿈 처리 적용 후 본문에 렌더링
             const formattedDesc = linkify(item.description);
             document.getElementById('modal-desc').innerHTML = formattedDesc;
             
@@ -696,14 +679,14 @@
             const modal = document.getElementById('sharing-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+            document.body.style.overflow = 'hidden'; 
         }
 
         function closeSharingModal() {
             const modal = document.getElementById('sharing-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            document.body.style.overflow = ''; // 배경 스크롤 원상복구
+            document.body.style.overflow = ''; 
         }
 
         // ==========================================
@@ -772,12 +755,11 @@
                 loadData(); 
             } else {
                 const pwd = prompt("관리자 비밀번호를 입력하세요:");
-                if (pwd === null) return; // 취소 버튼 클릭 시
+                if (pwd === null) return; 
                 
                 showToast("인증 서버 확인 중...");
                 const latestPass = await fetchAdminPassword(); 
 
-                // 공백 제거 후 비교 (안전한 인증 로직)
                 const inputPwd = pwd.trim();
                 const serverPwd = latestPass ? latestPass.trim() : ADMIN_PASSWORD.trim();
 
