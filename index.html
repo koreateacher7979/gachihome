@@ -74,6 +74,15 @@
             z-index: 1000;
         }
         .toast.show { bottom: 20px; }
+        
+        /* 팝업(모달) 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-animate {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-800 antialiased">
@@ -234,7 +243,7 @@
     </section>
 
     <!-- Free Sharing Section -->
-    <section id="sharing" class="py-24 bg-white">
+    <section id="sharing" class="py-24 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
                 <div>
@@ -248,7 +257,7 @@
                 <i class="ph ph-spinner-gap animate-spin text-4xl text-brand-accent"></i>
             </div>
 
-            <!-- Sharing Grid -->
+            <!-- Sharing Grid (썸네일 + 제목만 표시되는 카드 레이아웃) -->
             <div id="sharing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 hidden">
                 <!-- Sharing Cards will be injected here -->
             </div>
@@ -262,8 +271,39 @@
         </div>
     </section>
 
+    <!-- 무료나눔 게시글 모달 (클릭 시 팝업창) -->
+    <div id="sharing-modal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+        <!-- 배경 어둡게 -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeSharingModal()"></div>
+        <!-- 팝업 컨텐츠 -->
+        <div class="bg-white rounded-2xl w-full max-w-2xl mx-4 relative z-10 max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col modal-animate">
+            <button onclick="closeSharingModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/80 backdrop-blur rounded-full p-1 z-20 transition">
+                <i class="ph ph-x text-2xl"></i>
+            </button>
+            
+            <div class="relative h-64 sm:h-80 bg-gray-100 flex-shrink-0 w-full">
+                <img id="modal-image" src="" alt="나눔 자료 이미지" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            </div>
+            
+            <div class="p-6 sm:p-8 flex flex-col gap-3 relative -mt-8 bg-white rounded-t-2xl">
+                <div class="text-brand-accent text-sm font-semibold" id="modal-date"></div>
+                <h2 class="text-2xl font-bold text-brand-deep leading-tight" id="modal-title"></h2>
+                
+                <div class="text-gray-700 leading-relaxed whitespace-pre-wrap mt-2" id="modal-desc"></div>
+                
+                <div class="mt-6 pt-6 border-t border-gray-100">
+                    <a id="modal-link" href="#" target="_blank" class="w-full text-center bg-brand-accent text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="ph ph-download-simple text-xl"></i> 파일 다운로드 및 열기
+                    </a>
+                    <p class="text-xs text-gray-400 text-center mt-3">안전한 구글 드라이브 링크로 연결됩니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- About Section -->
-    <section id="about" class="py-24 bg-gray-50">
+    <section id="about" class="py-24 bg-white">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-16 items-center">
                 <div class="w-full md:w-5/12">
@@ -283,12 +323,12 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <div class="bg-gray-50 p-5 rounded-xl shadow-sm border border-gray-100">
                             <i class="ph ph-books text-2xl text-brand-accent mb-2"></i>
                             <h4 class="font-bold text-brand-deep mb-1">주요 저서</h4>
                             <p class="text-sm text-gray-500" data-editable="about_books">에듀테크 관련 전문 서적 집필 및 다수 기고</p>
                         </div>
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <div class="bg-gray-50 p-5 rounded-xl shadow-sm border border-gray-100">
                             <i class="ph ph-certificate text-2xl text-brand-accent mb-2"></i>
                             <h4 class="font-bold text-brand-deep mb-1">핵심 자격 및 이력</h4>
                             <p class="text-sm text-gray-500" data-editable="about_history">14년 교사 경력, MIEE, Google 공인 교육자</p>
@@ -300,14 +340,14 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-24 bg-white relative overflow-hidden">
+    <section id="contact" class="py-24 bg-gray-50 relative overflow-hidden">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-brand-deep mb-4">강의 및 컨설팅 의뢰</h2>
                 <p class="text-gray-600">원하시는 교육 내용과 일정을 남겨주시면, 검토 후 빠르게 연락드리겠습니다.</p>
             </div>
 
-            <div class="bg-brand-light/30 p-8 md:p-12 rounded-3xl border border-blue-100 shadow-sm">
+            <div class="bg-white p-8 md:p-12 rounded-3xl border border-gray-200 shadow-sm">
                 <form id="contact-form" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -380,18 +420,20 @@
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
-        let ADMIN_PASSWORD = "0330"; // 시트에서 가져오는 기본값 (변경됨)
+        let ADMIN_PASSWORD = "1004"; // 만약 서버 통신에 실패하더라도 1004가 기본값이 되도록 수정
 
         const mockReviews = [
             { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" },
             { id: 2, title: "생성형 AI 시대의 교사 리더십 워크숍", date: "2023.10.15", image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
         ];
 
-        // 나눔 자료 데모 데이터
         const mockSharing = [
-            { id: 1, title: "업무 자동화 구글 시트", description: "클릭 한 번으로 보고서를 생성하는 구글 시트 템플릿입니다. 사본 만들기로 가져가세요.", date: "2024.04.15", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", fileUrl: "#" },
+            { id: 1, title: "업무 자동화 구글 시트", description: "클릭 한 번으로 보고서를 생성하는 구글 시트 템플릿입니다.\n사본 만들기로 가져가세요.", date: "2024.04.15", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", fileUrl: "#" },
             { id: 2, title: "생성형 AI 프롬프트북", description: "수업 및 행정 업무에 바로 복사해서 쓸 수 있는 상황별 프롬프트 예시 모음집(PDF)입니다.", date: "2024.04.10", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80", fileUrl: "#" }
         ];
+        
+        // 상세 내용을 띄우기 위해 데이터를 전역 변수로 저장해둡니다.
+        window.sharingData = [];
 
         // ==========================================
         // 유틸리티: 모바일 완벽 대응 구글 드라이브 다중 폴백(Fallback) 함수
@@ -472,13 +514,12 @@
 
         async function fetchAdminPassword() {
             try {
-                // 캐시 우회를 위해 타임스탬프 추가
                 const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${new Date().getTime()}`;
                 const response = await fetch(fetchUrl);
                 const data = await response.json();
                 
                 if (data.success && data.adminPassword) {
-                    ADMIN_PASSWORD = data.adminPassword.toString();
+                    ADMIN_PASSWORD = data.adminPassword.toString().trim(); // 여백 방지
                     return ADMIN_PASSWORD;
                 }
             } catch (e) {
@@ -497,7 +538,7 @@
             if(cachedData) {
                 try {
                     const parsed = JSON.parse(cachedData);
-                    if(parsed.adminPassword) ADMIN_PASSWORD = parsed.adminPassword.toString();
+                    if(parsed.adminPassword) ADMIN_PASSWORD = parsed.adminPassword.toString().trim();
                     applySettings(parsed.settings);
                     renderReviews(parsed.reviews);
                     if(parsed.sharing) renderSharing(parsed.sharing);
@@ -518,7 +559,7 @@
                 
                 if(data.success) {
                     localStorage.setItem('kbc_site_data', JSON.stringify(data));
-                    if(data.adminPassword) ADMIN_PASSWORD = data.adminPassword.toString();
+                    if(data.adminPassword) ADMIN_PASSWORD = data.adminPassword.toString().trim();
                     applySettings(data.settings);
                     renderReviews(data.reviews);
                     if(data.sharing) renderSharing(data.sharing);
@@ -586,13 +627,17 @@
             });
         }
 
+        // 썸네일과 제목만 표시되는 새로운 카드 디자인 + 모달 팝업 연결
         function renderSharing(items) {
+            window.sharingData = items; // 모달창에 데이터를 전달하기 위해 전역으로 저장
             const container = document.getElementById('sharing-container');
             container.innerHTML = '';
             
             items.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col relative";
+                // 클릭하면 상세정보 모달창이 열리게 설정
+                card.className = "group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 relative flex flex-col cursor-pointer";
+                card.onclick = () => openSharingModal(item.id);
                 
                 const deleteBtnHtml = isAdmin ? `<button onclick="deleteSharing(event, '${item.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full z-10 hover:bg-red-600"><i class="ph ph-trash"></i></button>` : '';
                 
@@ -601,21 +646,50 @@
 
                 card.innerHTML = `
                     ${deleteBtnHtml}
-                    <div class="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 flex-shrink-0">
                         <img id="${imgId}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="자료 이미지" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-5">
+                            <h3 class="text-lg font-bold text-white leading-snug line-clamp-2 group-hover:text-brand-light transition">${item.title}</h3>
+                        </div>
                     </div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <span class="text-brand-accent text-xs font-semibold mb-2 block">${item.date}</span>
-                        <h3 class="text-xl font-bold text-brand-deep mb-2 line-clamp-1">${item.title}</h3>
-                        <p class="text-gray-600 text-sm mb-6 flex-grow line-clamp-2">${item.description}</p>
-                        <a href="${item.fileUrl}" target="_blank" class="w-full text-center bg-brand-light text-brand-accent font-bold py-2.5 rounded-lg hover:bg-brand-accent hover:text-white transition flex items-center justify-center gap-2">
-                            <i class="ph ph-download-simple text-lg"></i> 다운로드 / 열기
-                        </a>
+                    <div class="p-4 flex items-center justify-between bg-white text-sm">
+                        <span class="text-gray-400 font-medium">${item.date}</span>
+                        <span class="text-brand-accent font-bold group-hover:underline flex items-center gap-1">내용 보기 <i class="ph ph-arrow-right"></i></span>
                     </div>
                 `;
                 container.appendChild(card);
                 loadImageRobustly(document.getElementById(imgId), urls);
             });
+        }
+
+        // ==========================================
+        // 팝업(모달) 창 제어 함수
+        // ==========================================
+        function openSharingModal(id) {
+            const item = window.sharingData.find(x => x.id.toString() === id.toString());
+            if(!item) return;
+
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-date').innerText = item.date;
+            document.getElementById('modal-desc').innerText = item.description;
+            document.getElementById('modal-link').href = item.fileUrl;
+            
+            const modalImg = document.getElementById('modal-image');
+            modalImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; 
+            const urls = getGDriveUrls(item.image);
+            loadImageRobustly(modalImg, urls);
+
+            const modal = document.getElementById('sharing-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+        }
+
+        function closeSharingModal() {
+            const modal = document.getElementById('sharing-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = ''; // 배경 스크롤 원상복구
         }
 
         // ==========================================
@@ -686,10 +760,14 @@
                 const pwd = prompt("관리자 비밀번호를 입력하세요:");
                 if (pwd === null) return; // 취소 버튼 클릭 시
                 
-                showToast("인증 확인 중...");
-                const latestPass = await fetchAdminPassword(); // 서버에서 최신 비밀번호 강제 확인
+                showToast("인증 서버 확인 중...");
+                const latestPass = await fetchAdminPassword(); 
 
-                if(pwd === (latestPass || ADMIN_PASSWORD)) {
+                // 공백 제거 후 비교 (안전한 인증 로직)
+                const inputPwd = pwd.trim();
+                const serverPwd = latestPass ? latestPass.trim() : ADMIN_PASSWORD.trim();
+
+                if(inputPwd === serverPwd) {
                     isAdmin = true;
                     document.body.classList.add('admin-mode');
                     document.getElementById('admin-add-review').classList.remove('hidden');
@@ -698,7 +776,7 @@
                     showToast("관리자 모드 활성화 됨. 텍스트를 클릭하여 수정하세요.");
                     loadData(); 
                 } else {
-                    alert("비밀번호가 일치하지 않습니다.");
+                    alert("비밀번호가 일치하지 않습니다.\n(입력하신 값: " + inputPwd + ")");
                 }
             }
         }
@@ -799,7 +877,7 @@
         async function addSharingPrompt() {
             const title = prompt("무료 나눔 제목을 입력하세요:");
             if(!title) return;
-            const desc = prompt("자료에 대한 간단한 설명을 입력하세요:");
+            const desc = prompt("자료에 대한 상세 설명을 입력하세요 (게시물 클릭 시 보임):");
             if(!desc) return;
             
             let image = "";
