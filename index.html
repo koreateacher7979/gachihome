@@ -4,6 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>가치있는 미래교육 연구소 | 김병찬</title>
+    
+    <!-- [초고속 로딩 엔진 V2] 화면 렌더링 전 캐시된 이미지 주소를 즉시 주입하기 위한 사전 준비 -->
+    <script>
+        window.__KBC_CACHE = null;
+        try {
+            var cacheStr = localStorage.getItem('kbc_site_data');
+            if (cacheStr) {
+                window.__KBC_CACHE = JSON.parse(cacheStr);
+            }
+        } catch(e) {}
+
+        // 구글 드라이브 최고 속도 URL 변환기
+        window.getFastUrl = function(url) {
+            if (!url) return null;
+            var fileId = null;
+            var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (m) fileId = m[1];
+            else {
+                m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                if (url.includes('drive.google.com') && m) fileId = m[1];
+                else {
+                    m = url.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/);
+                    if (m) fileId = m[1];
+                }
+            }
+            return fileId ? 'https://lh3.googleusercontent.com/d/' + fileId : url;
+        };
+
+        // 핵심 이미지 사전 로딩 (Preload)
+        if (window.__KBC_CACHE && window.__KBC_CACHE.settings) {
+            ['logo_image', 'hero_image', 'profile_image'].forEach(function(key) {
+                var url = window.__KBC_CACHE.settings[key];
+                if (url) {
+                    var fastUrl = window.getFastUrl(url);
+                    if(fastUrl) document.write('<link rel="preload" as="image" href="' + fastUrl + '">');
+                }
+            });
+        }
+    </script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Phosphor Icons -->
@@ -94,6 +134,18 @@
                 <!-- 로고 영역 -->
                 <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
                     <img id="logo_image" src="https://via.placeholder.com/40x40/E6F0FA/3B82F6?text=LOGO" alt="로고" class="h-10 w-auto object-contain rounded editable-image" onclick="event.stopPropagation(); editImage('logo_image')" title="로고 이미지" referrerpolicy="no-referrer">
+                    <!-- 즉시 로고 이미지 교체 스크립트 -->
+                    <script>
+                        (function(){
+                            var url = window.__KBC_CACHE && window.__KBC_CACHE.settings && window.__KBC_CACHE.settings['logo_image'];
+                            if(url) {
+                                var fastUrl = window.getFastUrl(url);
+                                var img = document.getElementById('logo_image');
+                                img.src = fastUrl;
+                                img.dataset.loadedUrl = fastUrl;
+                            }
+                        })();
+                    </script>
                     <span class="font-bold text-2xl text-brand-deep tracking-tight" data-editable="site_name">가치있는 <span class="text-brand-accent">미래교육</span> 연구소</span>
                 </div>
                 <!-- Desktop Menu -->
@@ -151,6 +203,18 @@
                 <div class="w-full md:w-1/2">
                     <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer editable-image bg-gray-100" onclick="editImage('hero_image')">
                         <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer">
+                        <!-- 즉시 메인 이미지 교체 스크립트 -->
+                        <script>
+                            (function(){
+                                var url = window.__KBC_CACHE && window.__KBC_CACHE.settings && window.__KBC_CACHE.settings['hero_image'];
+                                if(url) {
+                                    var fastUrl = window.getFastUrl(url);
+                                    var img = document.getElementById('hero_image');
+                                    img.src = fastUrl;
+                                    img.dataset.loadedUrl = fastUrl;
+                                }
+                            })();
+                        </script>
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent flex items-end p-6">
                             <div class="text-white relative z-10">
                                 <p class="font-bold text-xl">김병찬 대표</p>
@@ -310,6 +374,18 @@
                 <div class="w-full md:w-5/12">
                     <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image bg-gray-100" onclick="editImage('profile_image')">
                         <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
+                        <!-- 즉시 프로필 이미지 교체 스크립트 -->
+                        <script>
+                            (function(){
+                                var url = window.__KBC_CACHE && window.__KBC_CACHE.settings && window.__KBC_CACHE.settings['profile_image'];
+                                if(url) {
+                                    var fastUrl = window.getFastUrl(url);
+                                    var img = document.getElementById('profile_image');
+                                    img.src = fastUrl;
+                                    img.dataset.loadedUrl = fastUrl;
+                                }
+                            })();
+                        </script>
                     </div>
                 </div>
                 <div class="md:w-7/12">
@@ -334,6 +410,13 @@
                             <h4 class="font-bold text-brand-deep mb-1">핵심 자격 및 이력</h4>
                             <p class="text-sm text-gray-500" data-editable="about_history">14년 교사 경력, MIEE, Google 공인 교육자</p>
                         </div>
+                    </div>
+
+                    <!-- 상세 프로필 이동 버튼 추가 -->
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <a href="https://koreateacher7979.github.io/intro_kbc/" target="_blank" class="inline-flex items-center justify-center gap-2 bg-brand-deep text-white px-8 py-3.5 rounded-xl font-bold hover:bg-brand-accent transition shadow-lg hover:shadow-xl w-full sm:w-auto">
+                            <i class="ph ph-identification-badge text-xl"></i> 상세 프로필 보기
+                        </a>
                     </div>
                 </div>
             </div>
@@ -418,8 +501,7 @@
         // ==========================================
         // 1. 설정 및 상태
         // ==========================================
-        // ★ 필수 확인: 아래 따옴표 안의 주소가 대표님의 웹 앱 URL인지 반드시 다시 확인해주세요! ★
-        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw_ZOOxmZMjJRMkrGPkY9iQcIZDXtfe6zgN4dbhJyzT4nrl2VTpbT0ESVT_Fkhs1NA/exec"; 
+        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyiAQ-qqJoA-LKjE6Wp49hVaddR0sUXsnaND0puv8vxSCwyqI3OcZfcdqKzKuFFYD4/exec"; 
         
         let isAdmin = false;
         let ADMIN_PASSWORD = "1004"; 
@@ -437,6 +519,7 @@
         // ==========================================
         // 유틸리티: 모바일 완벽 대응 구글 드라이브 다중 폴백(Fallback) 함수
         // ==========================================
+        // (이 함수는 혹시 모를 대비용이며, 초고속 로딩은 상단의 window.getFastUrl에서 처리합니다)
         function getGDriveUrls(url) {
             if (!url) return null;
             let fileId = null;
@@ -489,11 +572,20 @@
         }
 
         // ==========================================
-        // 2. 초기화 및 데이터 로딩 (캐시 무시 강력 새로고침)
+        // 2. 초기화 및 데이터 로딩
         // ==========================================
+        
+        // [속도 최적화 2단계] DOM을 다 읽기 전에 미리 캐시된 데이터로 화면 적용을 즉시 시도합니다.
+        if (window.__KBC_CACHE) {
+            if (window.__KBC_CACHE.adminPassword) ADMIN_PASSWORD = window.__KBC_CACHE.adminPassword.toString().trim();
+            if (window.__KBC_CACHE.settings) applySettings(window.__KBC_CACHE.settings);
+            if (window.__KBC_CACHE.reviews) renderReviews(window.__KBC_CACHE.reviews);
+            if (window.__KBC_CACHE.sharing) renderSharing(window.__KBC_CACHE.sharing);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initMobileMenu();
-            loadData();
+            loadData(); // 백그라운드에서 조용히 최신 데이터를 가져옵니다.
             setupContactForm();
         });
 
@@ -522,7 +614,6 @@
             return null;
         }
 
-        // 브라우저의 과거 캐시를 완전히 무시하고 항상 시트에서 최신 데이터를 가져옵니다.
         async function loadData() {
             const loaderR = document.getElementById('reviews-loader');
             const containerR = document.getElementById('reviews-container');
@@ -531,8 +622,7 @@
 
             try {
                 if(!GAS_WEBAPP_URL || GAS_WEBAPP_URL === "") {
-                    renderReviews(mockReviews); 
-                    renderSharing(mockSharing);
+                    if(!window.__KBC_CACHE) { renderReviews(mockReviews); renderSharing(mockSharing); }
                     return;
                 }
 
@@ -544,25 +634,28 @@
                 const data = await response.json();
                 
                 if(data.success) {
+                    localStorage.setItem('kbc_site_data', JSON.stringify(data));
                     if(data.adminPassword) ADMIN_PASSWORD = data.adminPassword.toString().trim();
-                    applySettings(data.settings);
                     
-                    // 데이터가 배열 형태로 오는지 안전하게 확인 후 렌더링
+                    // 백그라운드 업데이트
+                    applySettings(data.settings);
                     renderReviews(data.reviews || []);
                     renderSharing(data.sharing || []);
-                } else {
+                } else if(!window.__KBC_CACHE) {
                     renderReviews(mockReviews);
                     renderSharing(mockSharing);
                 }
             } catch (error) {
                 console.error("데이터 로드 실패:", error);
-                renderReviews(mockReviews); 
-                renderSharing(mockSharing);
+                if(!window.__KBC_CACHE) { renderReviews(mockReviews); renderSharing(mockSharing); }
             } finally {
-                loaderR.classList.add('hidden');
-                containerR.classList.remove('hidden');
-                loaderS.classList.add('hidden');
-                containerS.classList.remove('hidden');
+                // 캐시가 없는 첫 방문자일 때만 로딩바 숨기기 처리
+                if(!window.__KBC_CACHE) {
+                    if(loaderR) loaderR.classList.add('hidden');
+                    if(containerR) containerR.classList.remove('hidden');
+                    if(loaderS) loaderS.classList.add('hidden');
+                    if(containerS) containerS.classList.remove('hidden');
+                }
             }
         }
 
@@ -583,6 +676,8 @@
 
         function renderReviews(reviews) {
             const container = document.getElementById('reviews-container');
+            const loader = document.getElementById('reviews-loader');
+            if(loader) loader.classList.add('hidden'); // 즉시 스피너 제거
             container.innerHTML = '';
             
             reviews.forEach(review => {
@@ -613,11 +708,14 @@
                 container.appendChild(card);
                 loadImageRobustly(document.getElementById(imgId), urls);
             });
+            container.classList.remove('hidden');
         }
 
         function renderSharing(items) {
             window.sharingData = items; 
             const container = document.getElementById('sharing-container');
+            const loader = document.getElementById('sharing-loader');
+            if(loader) loader.classList.add('hidden'); // 즉시 스피너 제거
             container.innerHTML = '';
             
             items.forEach(item => {
@@ -646,6 +744,7 @@
                 container.appendChild(card);
                 loadImageRobustly(document.getElementById(imgId), urls);
             });
+            container.classList.remove('hidden');
         }
 
         // ==========================================
@@ -653,7 +752,6 @@
         // ==========================================
         function linkify(text) {
             if (!text) return '';
-            // 한글 및 특수문자가 포함된 주소도 인식할 수 있도록 정규식 대폭 개선
             var urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/ig;
             return text.replace(urlRegex, function(url) {
                 return '<a href="' + url + '" target="_blank" class="text-brand-accent font-bold hover:underline break-all">' + url + '</a>';
