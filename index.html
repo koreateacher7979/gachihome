@@ -1,1135 +1,636 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가치있는 미래교육 연구소 | 김병찬</title>
-    
-    <!-- [초고속 로딩 엔진 V2] 화면 렌더링 전 캐시된 이미지 주소를 즉시 주입하기 위한 사전 준비 -->
-    <script>
-        window.__KBC_CACHE = null;
-        try {
-            var cacheStr = localStorage.getItem('kbc_site_data');
-            if (cacheStr) {
-                window.__KBC_CACHE = JSON.parse(cacheStr);
-            }
-        } catch(e) {}
-
-        // 구글 드라이브 최고 속도 URL 변환기
-        window.getFastUrl = function(url) {
-            if (!url) return null;
-            var fileId = null;
-            var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-            if (m) fileId = m[1];
-            else {
-                m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-                if (url.includes('drive.google.com') && m) fileId = m[1];
-                else {
-                    m = url.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/);
-                    if (m) fileId = m[1];
-                }
-            }
-            return fileId ? 'https://lh3.googleusercontent.com/d/' + fileId : url;
-        };
-
-        // 핵심 이미지 사전 로딩 (Preload)
-        if (window.__KBC_CACHE && window.__KBC_CACHE.settings) {
-            ['logo_image', 'hero_image', 'profile_image'].forEach(function(key) {
-                var url = window.__KBC_CACHE.settings[key];
-                if (url) {
-                    var fastUrl = window.getFastUrl(url);
-                    if(fastUrl) document.write('<link rel="preload" as="image" href="' + fastUrl + '">');
-                }
-            });
-        }
-    </script>
-
+    <title>가치있는 미래교육 연구소</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Custom Tailwind Config -->
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            deep: '#0A2540', // Deep Blue
-                            light: '#E6F0FA',
-                            accent: '#3B82F6' // Primary Blue
-                        }
+                        primary: '#1E3A8A', // Trustworthy Navy
+                        secondary: '#3B82F6',
+                        accent: '#F59E0B',
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b'
                     },
                     fontFamily: {
-                        sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'sans-serif'],
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        body { font-family: 'Pretendard', sans-serif; scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans KR', sans-serif; scroll-behavior: smooth; }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .dark .glass-nav {
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        .slide-up { animation: slideUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
         
-        /* 관리자 모드 스타일 - 모바일에서도 뚜렷하게 보이도록 개선 */
-        .admin-mode [data-editable], .admin-mode .editable-image {
-            border: 3px dashed #f59e0b !important;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-        }
-        .admin-mode [data-editable]:hover, .admin-mode .editable-image:hover {
-            background-color: rgba(245, 158, 11, 0.1);
-        }
-        /* 안내 문구가 짤리지 않게 박스 안쪽으로 이동하고 항상 보이게(opacity: 0.9) 설정 */
-        .admin-mode [data-editable]::after, .admin-mode .editable-image::after {
-            content: '클릭하여 수정';
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: #f59e0b;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 6px;
-            opacity: 0.9; 
-            pointer-events: none;
-            white-space: nowrap;
-            z-index: 50;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .admin-mode [data-editable]:hover::after, .admin-mode .editable-image:hover::after { opacity: 1; }
-        
-        .toast {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            transition: bottom 0.3s ease-in-out;
-            z-index: 1000;
-        }
-        .toast.show { bottom: 20px; }
-        
-        /* 팝업(모달) 애니메이션 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .modal-animate {
-            animation: fadeIn 0.2s ease-out forwards;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-white text-gray-800 antialiased">
+<body class="bg-gray-50 text-gray-800 dark:bg-darkBg dark:text-gray-100 transition-colors duration-300">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-50 transition-all duration-300">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- 로고 영역 -->
-                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <img id="logo_image" src="https://via.placeholder.com/40x40/E6F0FA/3B82F6?text=LOGO" alt="로고" class="h-10 w-auto object-contain rounded editable-image" onclick="event.stopPropagation(); editImage('logo_image')" title="로고 이미지" referrerpolicy="no-referrer">
-                    <!-- 즉시 로고 이미지 교체 스크립트 -->
-                    <script>
-                        (function(){
-                            var url = window.__KBC_CACHE && window.__KBC_CACHE.settings && window.__KBC_CACHE.settings['logo_image'];
-                            if(url) {
-                                var fastUrl = window.getFastUrl(url);
-                                var img = document.getElementById('logo_image');
-                                img.src = fastUrl;
-                                img.dataset.loadedUrl = fastUrl;
-                            }
-                        })();
-                    </script>
-                    <span class="font-bold text-2xl text-brand-deep tracking-tight" data-editable="site_name">가치있는 <span class="text-brand-accent">미래교육</span> 연구소</span>
+    <nav class="fixed w-full z-40 glass-nav transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img id="navLogo" src="" alt="로고" class="h-10 w-10 object-contain hidden dark:bg-white/90 dark:p-1 dark:rounded-lg transition-colors">
+                    <span id="navTitle" class="text-xl font-bold text-primary dark:text-blue-400">가치있는 미래교육 연구소</span>
                 </div>
+                
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#about" class="text-gray-600 hover:text-brand-accent font-medium">프로필</a>
-                    <a href="#services" class="text-gray-600 hover:text-brand-accent font-medium">전문 분야</a>
-                    <a href="#reviews" class="text-gray-600 hover:text-brand-accent font-medium">강의 후기</a>
-                    <a href="#sharing" class="text-gray-600 hover:text-brand-accent font-medium">무료 나눔</a>
-                    <a href="#contact" class="bg-brand-deep text-white px-5 py-2 rounded-full hover:bg-blue-800 transition font-medium">강의 의뢰</a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-white font-medium">소개</a>
+                    <a href="#career" class="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-white font-medium">경력 및 이력</a>
+                    <a href="#proposals" class="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-white font-medium">강의제안</a>
+                    <a href="#contact" class="bg-primary text-white px-5 py-2 rounded-full hover:bg-blue-800 transition shadow-lg font-medium">강의 의뢰하기</a>
+                    
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                        <i id="themeIcon" class="fas fa-moon text-gray-600 dark:text-gray-300 text-lg"></i>
+                    </button>
                 </div>
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-deep focus:outline-none">
-                        <i class="ph ph-list text-3xl"></i>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center gap-4">
+                    <button onclick="toggleTheme()" class="p-2 rounded-full">
+                        <i id="themeIconMobile" class="fas fa-moon text-gray-600 dark:text-gray-300 text-lg"></i>
+                    </button>
+                    <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="text-gray-600 dark:text-gray-300">
+                        <i class="fas fa-bars text-2xl"></i>
                     </button>
                 </div>
             </div>
         </div>
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-darkCard border-t dark:border-gray-700">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#about" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">프로필</a>
-                <a href="#services" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">전문 분야</a>
-                <a href="#reviews" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">강의 후기</a>
-                <a href="#sharing" class="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">무료 나눔</a>
-                <a href="#contact" class="block px-3 py-2 text-brand-accent font-bold hover:bg-gray-50 rounded-md">강의 의뢰</a>
+                <a href="#about" class="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-200">소개</a>
+                <a href="#career" class="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-200">경력 및 이력</a>
+                <a href="#proposals" class="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-200">강의제안</a>
+                <a href="#contact" class="block px-3 py-2 text-base font-medium text-primary dark:text-blue-400">강의 의뢰하기</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="pt-32 pb-20 md:pt-40 md:pb-28 bg-brand-light relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10 pattern-bg"></div>
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="flex flex-col md:flex-row items-center gap-12">
-                <div class="md:w-1/2 text-center md:text-left">
-                    <div class="inline-block px-4 py-1.5 rounded-full bg-brand-accent/10 text-brand-accent font-semibold text-sm mb-6" data-editable="hero_badge">
-                        디지털 전환 시대의 교육 파트너
-                    </div>
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-brand-deep leading-tight mb-6" data-editable="hero_title">
-                        미래를 여는 교육,<br>가치를 증명합니다.
-                    </h1>
-                    <p class="text-lg text-gray-600 mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed" data-editable="hero_subtitle">
-                        생성형 AI부터 에듀테크, 리더십까지. 14년 교사 경력과 풍부한 현장 노하우로 가장 실용적이고 혁신적인 교육 솔루션을 제공합니다.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                        <a href="#contact" class="bg-brand-accent text-white px-8 py-3.5 rounded-full font-bold hover:bg-blue-600 transition shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                            강의 의뢰하기 <i class="ph ph-arrow-right"></i>
-                        </a>
-                        <a href="https://blog.naver.com/kbc792000" target="_blank" class="bg-white text-brand-deep border border-brand-deep/20 px-8 py-3.5 rounded-full font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2">
-                            블로그 방문하기 <i class="ph ph-arrow-square-out"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="w-full md:w-1/2">
-                    <div class="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer editable-image bg-gray-100" onclick="editImage('hero_image')">
-                        <img id="hero_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표 강의 모습" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer">
-                        <!-- 즉시 메인 이미지 교체 스크립트 -->
-                        <script>
-                            (function(){
-                                var url = window.__KBC_CACHE && window.__KBC_CACHE.settings && window.__KBC_CACHE.settings['hero_image'];
-                                if(url) {
-                                    var fastUrl = window.getFastUrl(url);
-                                    var img = document.getElementById('hero_image');
-                                    img.src = fastUrl;
-                                    img.dataset.loadedUrl = fastUrl;
-                                }
-                            })();
-                        </script>
-                        <div class="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent flex items-end p-6">
-                            <div class="text-white relative z-10">
-                                <p class="font-bold text-xl">김병찬 대표</p>
-                                <p class="text-sm opacity-90">가치있는 미래교육 연구소</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <header id="about" class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center gap-12">
+        <div class="flex-1 slide-up" style="animation-delay: 0.2s;">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900 text-primary dark:text-blue-200 font-semibold text-sm mb-6">
+                최고의 공교육 수업 전문가
+            </div>
+            <h1 id="heroTitle" class="text-4xl md:text-5xl font-extrabold leading-tight mb-6 text-gray-900 dark:text-white">
+                가치있는 미래교육 연구소
+            </h1>
+            <div id="heroIntro" class="text-lg text-gray-600 dark:text-gray-300 space-y-4 mb-8 leading-relaxed">
+                <!-- Introduction rows will be injected here -->
+            </div>
+            <div class="flex flex-wrap gap-4">
+                <a href="#contact" class="bg-primary hover:bg-blue-800 text-white px-8 py-3 rounded-full font-bold shadow-lg transition transform hover:-translate-y-1">
+                    문의하기
+                </a>
+                <a href="#proposals" class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-3 rounded-full font-bold shadow transition">
+                    강의제안서 보기
+                </a>
             </div>
         </div>
-    </section>
-
-    <!-- Services Section -->
-    <section id="services" class="py-24 bg-white">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-brand-deep mb-4">핵심 전문 분야</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">이론에 그치지 않고, 현장에 즉시 적용 가능한 실무 중심의 교육을 진행합니다.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Card 1 -->
-                <div class="bg-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-                    <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-accent transition">
-                        <i class="ph ph-robot text-3xl text-brand-accent group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-brand-deep mb-3" data-editable="service_1_title">생성형 AI 활용</h3>
-                    <p class="text-gray-600 leading-relaxed text-sm" data-editable="service_1_desc">ChatGPT, Gemini 등 다양한 생성형 AI를 업무와 교육 현장에 효율적으로 도입하고 활용하는 실무 가이드.</p>
-                </div>
-                <!-- Card 2 -->
-                <div class="bg-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-                    <div class="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-500 transition">
-                        <i class="ph ph-chalkboard-teacher text-3xl text-indigo-500 group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-brand-deep mb-3" data-editable="service_2_title">에듀테크 실무</h3>
-                    <p class="text-gray-600 leading-relaxed text-sm" data-editable="service_2_desc">Microsoft, Google Workspace 등 글로벌 에듀테크 플랫폼을 활용한 혁신적인 수업 및 협업 설계 방법론.</p>
-                </div>
-                <!-- Card 3 -->
-                <div class="bg-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-                    <div class="w-14 h-14 bg-teal-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-teal-500 transition">
-                        <i class="ph ph-devices text-3xl text-teal-500 group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-brand-deep mb-3" data-editable="service_3_title">디지털 도구 리터러시</h3>
-                    <p class="text-gray-600 leading-relaxed text-sm" data-editable="service_3_desc">스마트워크, Notion, Canva 등 디지털 생산성 도구를 마스터하여 업무 효율을 극대화하는 노하우.</p>
-                </div>
-                <!-- Card 4 -->
-                <div class="bg-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-                    <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-orange-500 transition">
-                        <i class="ph ph-users-three text-3xl text-orange-500 group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-brand-deep mb-3" data-editable="service_4_title">미래 교육 리더십</h3>
-                    <p class="text-gray-600 leading-relaxed text-sm" data-editable="service_4_desc">급변하는 디지털 전환(DX) 시대, 조직을 이끌고 변화를 주도하는 관리자 및 교육자를 위한 리더십 연수.</p>
-                </div>
+        <div class="flex-1 flex justify-center slide-up">
+            <div class="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800">
+                <img id="profileImg" src="https://placehold.co/400x400/1E3A8A/ffffff?text=Profile" alt="대표 이미지" class="w-full h-full object-cover">
             </div>
         </div>
-    </section>
+    </header>
 
-    <!-- Review Showcase -->
-    <section id="reviews" class="py-24 bg-brand-deep text-white">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/20 pb-6">
+    <section class="bg-white dark:bg-darkCard py-16 border-y border-gray-100 dark:border-gray-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Guide Sites -->
                 <div>
-                    <h2 class="text-3xl font-bold mb-3">생생한 현장의 목소리</h2>
-                    <p class="text-gray-300">네이버 블로그에 기록된 수많은 강의 후기와 인사이트를 확인하세요.</p>
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-link text-primary"></i> 안내 사이트 바로가기</h2>
+                    <div id="guideSites" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Buttons injected here -->
+                    </div>
                 </div>
-                <div class="mt-6 md:mt-0">
-                    <a href="https://blog.naver.com/kbc792000" target="_blank" class="text-brand-accent hover:text-white transition flex items-center gap-2 font-semibold">
-                        전체 후기 보기 <i class="ph ph-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Loader -->
-            <div id="reviews-loader" class="flex justify-center py-12">
-                <i class="ph ph-spinner-gap animate-spin text-4xl text-brand-accent"></i>
-            </div>
-
-            <!-- Reviews Grid -->
-            <div id="reviews-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
-                <!-- Review Cards will be injected here -->
-            </div>
-            
-            <!-- 관리자 모드 시 나타나는 버튼 -->
-            <div id="admin-add-review" class="hidden mt-10 text-center">
-                <button onclick="addReviewPrompt()" class="bg-brand-accent/20 border border-brand-accent text-white px-6 py-3 rounded-lg hover:bg-brand-accent transition flex items-center justify-center gap-2 mx-auto">
-                    <i class="ph ph-plus-circle"></i> 새로운 리뷰 추가하기 (시트에 반영)
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Free Sharing Section -->
-    <section id="sharing" class="py-24 bg-gray-50">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
+                <!-- Books -->
                 <div>
-                    <h2 class="text-3xl font-bold text-brand-deep mb-3">무료 나눔 자료실</h2>
-                    <p class="text-gray-600">제가 직접 기획하고 제작한 유용한 교육용 프로그램과 자료를 나눕니다.</p>
-                </div>
-            </div>
-
-            <!-- Loader -->
-            <div id="sharing-loader" class="flex justify-center py-12">
-                <i class="ph ph-spinner-gap animate-spin text-4xl text-brand-accent"></i>
-            </div>
-
-            <!-- Sharing Grid (썸네일 + 제목만 표시되는 카드 레이아웃) -->
-            <div id="sharing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 hidden">
-                <!-- Sharing Cards will be injected here -->
-            </div>
-            
-            <!-- 관리자 모드 시 나타나는 버튼 -->
-            <div id="admin-add-sharing" class="hidden mt-10 text-center">
-                <button onclick="addSharingPrompt()" class="bg-white border-2 border-brand-accent text-brand-accent px-6 py-3 rounded-lg hover:bg-brand-accent hover:text-white transition flex items-center justify-center gap-2 mx-auto font-bold shadow-sm">
-                    <i class="ph ph-plus-circle text-xl"></i> 새로운 나눔 자료 등록하기
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- 무료나눔 게시글 모달 (클릭 시 팝업창) -->
-    <div id="sharing-modal" class="fixed inset-0 z-[100] hidden items-center justify-center">
-        <!-- 배경 어둡게 -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeSharingModal()"></div>
-        <!-- 팝업 컨텐츠 -->
-        <div class="bg-white rounded-2xl w-full max-w-2xl mx-4 relative z-10 max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col modal-animate">
-            <button onclick="closeSharingModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/80 backdrop-blur rounded-full p-1 z-20 transition">
-                <i class="ph ph-x text-2xl"></i>
-            </button>
-            
-            <div class="relative h-64 sm:h-80 bg-gray-100 flex-shrink-0 w-full">
-                <img id="modal-image" src="" alt="나눔 자료 이미지" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            </div>
-            
-            <div class="p-6 sm:p-8 flex flex-col gap-3 relative -mt-8 bg-white rounded-t-2xl">
-                <div class="text-brand-accent text-sm font-semibold" id="modal-date"></div>
-                <h2 class="text-2xl font-bold text-brand-deep leading-tight" id="modal-title"></h2>
-                
-                <!-- 본문 (링크 자동 변환 적용) -->
-                <div class="text-gray-700 leading-relaxed whitespace-pre-wrap mt-2" id="modal-desc"></div>
-                
-                <div class="mt-6 pt-6 border-t border-gray-100">
-                    <a id="modal-link" href="#" target="_blank" class="w-full text-center bg-brand-accent text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition flex items-center justify-center gap-2 shadow-md">
-                        <i class="ph ph-download-simple text-xl"></i> 파일 다운로드 및 열기
-                    </a>
-                    <p class="text-xs text-gray-400 text-center mt-3">안전한 다운로드 링크 또는 관련 페이지로 연결됩니다.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- About Section -->
-    <section id="about" class="py-24 bg-white">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row gap-16 items-center">
-                <div class="w-full md:w-5/12">
-                    <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl editable-image bg-gray-100" onclick="editImage('profile_image')">
-                        <img id="profile_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="김병찬 대표" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer">
-                        <!-- 즉시 프로필 이미지 교체 스크립트 -->
-                        <script>
-                            (function(){
-                                var url = window.__KBC_CACHE && window.__KBC_CACHE.settings && window.__KBC_CACHE.settings['profile_image'];
-                                if(url) {
-                                    var fastUrl = window.getFastUrl(url);
-                                    var img = document.getElementById('profile_image');
-                                    img.src = fastUrl;
-                                    img.dataset.loadedUrl = fastUrl;
-                                }
-                            })();
-                        </script>
-                    </div>
-                </div>
-                <div class="md:w-7/12">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-deep text-white font-bold text-sm mb-6">
-                        <i class="ph ph-medal"></i> Microsoft Innovative Educator Expert
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-bold text-brand-deep mb-6" data-editable="about_title">현장의 언어로 소통하는 전문가</h2>
-                    
-                    <div class="space-y-4 text-gray-600 mb-8" data-editable="about_content">
-                        <p>14년간의 교직 생활을 통해 누구보다 교육 현장의 니즈를 깊이 이해하고 있습니다. 기술이 기술로 끝나지 않고, 실제적인 변화와 성장을 이끌어내는 '가치 있는 교육'을 지향합니다.</p>
-                        <p>수많은 연수와 컨설팅 경험을 바탕으로 대상자 맞춤형 커리큘럼을 제공하며, 지루한 이론이 아닌 현장에서 즉시 활용 가능한 실무 중심의 워크숍을 진행합니다.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 p-5 rounded-xl shadow-sm border border-gray-100">
-                            <i class="ph ph-books text-2xl text-brand-accent mb-2"></i>
-                            <h4 class="font-bold text-brand-deep mb-1">주요 저서</h4>
-                            <p class="text-sm text-gray-500" data-editable="about_books">에듀테크 관련 전문 서적 집필 및 다수 기고</p>
-                        </div>
-                        <div class="bg-gray-50 p-5 rounded-xl shadow-sm border border-gray-100">
-                            <i class="ph ph-certificate text-2xl text-brand-accent mb-2"></i>
-                            <h4 class="font-bold text-brand-deep mb-1">핵심 자격 및 이력</h4>
-                            <p class="text-sm text-gray-500" data-editable="about_history">14년 교사 경력, MIEE, Google 공인 교육자</p>
-                        </div>
-                    </div>
-
-                    <!-- 상세 프로필 이동 버튼 추가 -->
-                    <div class="mt-8 pt-6 border-t border-gray-100">
-                        <a href="https://koreateacher7979.github.io/intro_kbc/" target="_blank" class="inline-flex items-center justify-center gap-2 bg-brand-deep text-white px-8 py-3.5 rounded-xl font-bold hover:bg-brand-accent transition shadow-lg hover:shadow-xl w-full sm:w-auto">
-                            <i class="ph ph-identification-badge text-xl"></i> 상세 프로필 보기
-                        </a>
-                    </div>
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-book text-primary"></i> 주요 저서</h2>
+                    <ul id="booksList" class="space-y-3">
+                        <!-- Book list injected here -->
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-24 bg-gray-50 relative overflow-hidden">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="career" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">경력 및 이력사항</h2>
+            <p class="mt-4 text-gray-600 dark:text-gray-400">끊임없는 연구와 실전 경험으로 증명합니다.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex justify-center mb-8 border-b dark:border-gray-700">
+            <button onclick="switchTab('tabCareer')" id="btn-tabCareer" class="tab-btn px-6 py-3 font-semibold text-primary border-b-2 border-primary">경력</button>
+            <button onclick="switchTab('tabQual')" id="btn-tabQual" class="tab-btn px-6 py-3 font-semibold text-gray-500 hover:text-primary dark:text-gray-400">자격사항</button>
+            <button onclick="switchTab('tabHistory')" id="btn-tabHistory" class="tab-btn px-6 py-3 font-semibold text-gray-500 hover:text-primary dark:text-gray-400">강의이력</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm p-6 md:p-10 border border-gray-100 dark:border-gray-800">
+            <div id="tabCareer" class="tab-content block">
+                <ul id="careerList" class="space-y-4 relative border-l-2 border-blue-100 dark:border-gray-700 ml-4 pl-6">
+                    <!-- Career items -->
+                </ul>
+            </div>
+            <div id="tabQual" class="tab-content hidden">
+                <div id="qualList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Qualification items -->
+                </div>
+            </div>
+            <div id="tabHistory" class="tab-content hidden">
+                <ul id="historyList" class="space-y-3 text-gray-700 dark:text-gray-300">
+                    <!-- Lecture history items -->
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="proposals" class="bg-blue-50 dark:bg-slate-800 py-20 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-brand-deep mb-4">강의 및 컨설팅 의뢰</h2>
-                <p class="text-gray-600">원하시는 교육 내용과 일정을 남겨주시면, 검토 후 빠르게 연락드리겠습니다.</p>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">강의 제안 모음</h2>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">다양한 맞춤형 교육 제안서를 확인해 보세요.</p>
             </div>
+            <div id="proposalsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Proposal Cards injected here -->
+            </div>
+        </div>
+    </section>
 
-            <div class="bg-white p-8 md:p-12 rounded-3xl border border-gray-200 shadow-sm">
-                <form id="contact-form" class="space-y-6">
+    <section id="contact" class="py-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-darkCard rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+            <div class="bg-primary px-8 py-6 text-white">
+                <h2 class="text-2xl font-bold">강의 의뢰 및 문의하기</h2>
+                <p class="mt-2 text-blue-100">아래 폼을 작성해주시면 빠른 시일 내에 연락드리겠습니다.</p>
+            </div>
+            <div class="p-8">
+                <form id="inquiryForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">담당자 성함</label>
-                            <input type="text" id="contact_name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-accent focus:border-transparent transition" placeholder="홍길동">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">담당자 이름 *</label>
+                            <input type="text" id="fmName" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">소속 기관/학교</label>
-                            <input type="text" id="contact_org" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-accent focus:border-transparent transition" placeholder="OO교육청 / OO학교">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">소속기관 및 학교 *</label>
+                            <input type="text" id="fmOrg" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition">
                         </div>
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">연락처 (이메일 또는 전화번호)</label>
-                            <input type="text" id="contact_email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-accent focus:border-transparent transition" placeholder="010-1234-5678 또는 email@example.com">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">이메일 *</label>
+                            <input type="email" id="fmEmail" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">희망 교육 분야</label>
-                            <select id="contact_topic" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-accent focus:border-transparent transition bg-white">
-                                <option>생성형 AI 활용</option>
-                                <option>에듀테크 실무</option>
-                                <option>디지털 도구 리터러시</option>
-                                <option>미래 교육 리더십</option>
-                                <option>기타 맞춤형 연수</option>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">전화번호 *</label>
+                            <input type="tel" id="fmPhone" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition" placeholder="010-0000-0000">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">지역 *</label>
+                            <input type="text" id="fmRegion" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition" placeholder="예: 서울, 경기, 부산 등">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">희망교육분야 *</label>
+                            <select id="fmCategory" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition appearance-none">
+                                <option value="">선택해주세요</option>
+                                <!-- Categories injected here -->
                             </select>
                         </div>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">예상 강의료 (선택 사항)</label>
-                        <input type="text" id="contact_fee" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-accent focus:border-transparent transition" placeholder="예: 2시간 100만원 / 협의 후 결정">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">예상 강의료 (선택)</label>
+                        <input type="text" id="fmFee" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition" placeholder="예: 2시간 00만원">
                     </div>
+
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">상세 문의 내용 (일정, 대상 등)</label>
-                        <textarea id="contact_message" rows="4" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-accent focus:border-transparent transition" placeholder="희망 일정, 교육 대상 인원, 특별히 원하시는 내용 등을 자유롭게 적어주세요."></textarea>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">상세 문의내용 *</label>
+                        <textarea id="fmDetails" required rows="5" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none transition"></textarea>
                     </div>
-                    <button type="submit" id="submit-btn" class="w-full bg-brand-deep text-white font-bold py-4 rounded-xl hover:bg-brand-accent transition shadow-lg flex justify-center items-center gap-2">
-                        <span>의뢰서 전송하기</span>
-                        <i id="submit-spinner" class="ph ph-spinner-gap animate-spin hidden"></i>
+
+                    <button type="submit" class="w-full bg-primary hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:-translate-y-1 flex justify-center items-center gap-2">
+                        <i class="fas fa-paper-plane"></i> 문의 접수하기
                     </button>
                 </form>
-                <div id="success-message" class="hidden mt-6 bg-green-50 text-green-700 p-4 rounded-xl text-center font-medium border border-green-200">
-                    <i class="ph ph-check-circle text-xl align-middle mr-1"></i> 문의가 성공적으로 접수되었습니다. 곧 연락드리겠습니다.
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-400 py-12 text-sm text-center">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col items-center">
-            <h3 class="text-white text-xl font-bold tracking-tight mb-4">가치있는 미래교육 연구소</h3>
-            <p class="mb-2">대표 : 김병찬 | 블로그 : blog.naver.com/kbc792000</p>
-            <p class="mb-6">Copyright © 2025 가치있는 미래교육 연구소. All rights reserved.</p>
-            
-            <!-- 관리자 모드 진입 버튼 -->
-            <button onclick="toggleAdminMode()" class="text-gray-700 hover:text-gray-300 transition flex items-center gap-1" title="관리자 모드">
-                <i class="ph ph-lock-key"></i> <span class="text-xs">Admin Login</span>
-            </button>
+    <footer class="bg-gray-900 text-gray-400 py-10 text-center relative">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="mb-2" id="footerTitle">가치있는 미래교육 연구소</p>
+            <p class="text-sm">© 2026 All rights reserved.</p>
         </div>
+        
+        <!-- Admin Settings Button -->
+        <button onclick="openAdminModal()" class="absolute right-6 bottom-6 w-12 h-12 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-full shadow-lg flex items-center justify-center transition">
+            <i class="fas fa-cog"></i>
+        </button>
     </footer>
 
-    <!-- Toast Message -->
-    <div id="toast" class="toast">저장되었습니다.</div>
+    <!-- Admin Modal -->
+    <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform" id="adminModalContent">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">관리자 로그인</h3>
+                <button onclick="closeAdminModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">구글 시트 설정에 등록된 관리자 비밀번호를 입력하세요.</p>
+            <input type="password" id="adminPw" class="w-full px-4 py-3 border rounded-lg mb-4 focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white outline-none" placeholder="비밀번호 입력">
+            <button onclick="verifyAdmin()" class="w-full bg-gray-900 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-black transition">
+                인증 후 시트 접속
+            </button>
+        </div>
+    </div>
 
-    <!-- JavaScript & Google Apps Script Interoperability -->
+    <!-- Message Modal -->
+    <div id="msgModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl text-center">
+            <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4 text-green-500 text-3xl">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2" id="msgTitle">전송 완료</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6" id="msgDesc">메시지가 성공적으로 전달되었습니다.</p>
+            <button onclick="closeMsgModal()" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-800 transition">
+                확인
+            </button>
+        </div>
+    </div>
+
     <script>
-        // ==========================================
-        // 1. 설정 및 상태
-        // ==========================================
-        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw_ZOOxmZMjJRMkrGPkY9iQcIZDXtfe6zgN4dbhJyzT4nrl2VTpbT0ESVT_Fkhs1NA/exec"; 
-        
-        let isAdmin = false;
-        let ADMIN_PASSWORD = "1004"; 
+        // Google Sheet Config
+        const SHEET_ID = '1IHc4Erz6Jb3IAlaTU8jXvev0V8I9ou1ufF1UxjECNlU';
+        let configData = {
+            adminPw: '',
+            adminEmail: '',
+            title: '',
+            logoUrl: '',
+            profileUrl: ''
+        };
 
-        const mockReviews = [
-            { id: 1, title: "[수요자 맞춤 연수] 구글 워크스페이스 실무 활용", date: "2023.11.27", image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80", link: "https://blog.naver.com/kbc792000" }
-        ];
-
-        const mockSharing = [
-            { id: 1, title: "가치있는 미래교육 자료실", description: "아직 시트와 연결되지 않았습니다. Apps Script 주소를 확인해주세요.", date: "2024.04.15", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", fileUrl: "#" }
-        ];
-        
-        window.sharingData = [];
-
-        // ==========================================
-        // 유틸리티: 모바일 완벽 대응 구글 드라이브 다중 폴백(Fallback) 함수
-        // ==========================================
-        // (이 함수는 혹시 모를 대비용이며, 초고속 로딩은 상단의 window.getFastUrl에서 처리합니다)
-        function getGDriveUrls(url) {
-            if (!url) return null;
-            let fileId = null;
-            const regex1 = /\/file\/d\/([a-zA-Z0-9_-]+)/;
-            const match1 = url.match(regex1);
-            if (match1 && match1[1]) fileId = match1[1];
-            
-            const regex2 = /[?&]id=([a-zA-Z0-9_-]+)/;
-            const match2 = url.match(regex2);
-            if (url.includes('drive.google.com') && match2 && match2[1]) fileId = match2[1];
-
-            const regex3 = /lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/;
-            const match3 = url.match(regex3);
-            if (match3 && match3[1]) fileId = match3[1];
-
-            if (fileId) {
-                return [
-                    `https://lh3.googleusercontent.com/d/${fileId}`, 
-                    `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, 
-                    `https://drive.google.com/uc?export=view&id=${fileId}` 
-                ];
-            }
-            return [url]; 
-        }
-
-        function loadImageRobustly(imgEl, urls) {
-            if (!imgEl || !urls || urls.length === 0) return;
-            if (imgEl.dataset.loadedUrl && urls.includes(imgEl.dataset.loadedUrl)) return;
-
-            imgEl.dataset.urls = JSON.stringify(urls);
-            imgEl.dataset.urlIdx = "0";
-
-            imgEl.onload = function() {
-                this.dataset.loadedUrl = this.src;
-                this.onerror = null; 
-            };
-
-            imgEl.onerror = function() {
-                let idx = parseInt(this.dataset.urlIdx) + 1;
-                let parsedUrls = JSON.parse(this.dataset.urls);
-                if (idx < parsedUrls.length) {
-                    this.dataset.urlIdx = idx.toString();
-                    this.src = parsedUrls[idx];
-                } else {
-                    this.onerror = null;
-                    this.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
+        // Initialize App immediately without loading screen
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                    updateThemeIcon();
                 }
-            };
-            imgEl.src = urls[0];
-        }
 
-        // ==========================================
-        // 2. 초기화 및 데이터 로딩
-        // ==========================================
-        
-        // [속도 최적화 2단계] DOM을 다 읽기 전에 미리 캐시된 데이터로 화면 적용을 즉시 시도합니다.
-        if (window.__KBC_CACHE) {
-            if (window.__KBC_CACHE.adminPassword) ADMIN_PASSWORD = window.__KBC_CACHE.adminPassword.toString().trim();
-            if (window.__KBC_CACHE.settings) applySettings(window.__KBC_CACHE.settings);
-            if (window.__KBC_CACHE.reviews) renderReviews(window.__KBC_CACHE.reviews);
-            if (window.__KBC_CACHE.sharing) renderSharing(window.__KBC_CACHE.sharing);
-        }
+                await loadAllData();
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initMobileMenu();
-            loadData(); // 백그라운드에서 조용히 최신 데이터를 가져옵니다.
-            setupContactForm();
+            } catch (error) {
+                console.error("Error loading data:", error);
+            }
         });
 
-        function initMobileMenu() {
-            const btn = document.getElementById('mobile-menu-btn');
-            const menu = document.getElementById('mobile-menu');
-            btn.addEventListener('click', () => menu.classList.toggle('hidden'));
-            menu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => menu.classList.add('hidden'));
-            });
+        // Theme Toggle
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
         }
 
-        async function fetchAdminPassword() {
-            try {
-                const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${new Date().getTime()}`;
-                const response = await fetch(fetchUrl);
-                const data = await response.json();
-                
-                if (data.success && data.adminPassword) {
-                    ADMIN_PASSWORD = data.adminPassword.toString().trim(); 
-                    return ADMIN_PASSWORD;
-                }
-            } catch (e) {
-                console.error("비밀번호 로드 실패", e);
+        function updateThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-yellow-400 text-lg' : 'fas fa-moon text-gray-600 text-lg';
+            document.getElementById('themeIconMobile').className = isDark ? 'fas fa-sun text-yellow-400 text-lg' : 'fas fa-moon text-gray-600 text-lg';
+        }
+
+        // Fetch helper for Google Sheets GViz API
+        async function fetchSheet(sheetName) {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&headers=1`;
+            const response = await fetch(url);
+            const text = await response.text();
+            
+            const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\)/);
+            if (!match) {
+                throw new Error(`[${sheetName}] 데이터 파싱 실패. 시트 이름이나 공유 권한을 확인하세요.`);
             }
-            return null;
-        }
-
-        async function loadData() {
-            const loaderR = document.getElementById('reviews-loader');
-            const containerR = document.getElementById('reviews-container');
-            const loaderS = document.getElementById('sharing-loader');
-            const containerS = document.getElementById('sharing-container');
-
-            try {
-                if(!GAS_WEBAPP_URL || GAS_WEBAPP_URL === "") {
-                    if(!window.__KBC_CACHE) { renderReviews(mockReviews); renderSharing(mockSharing); }
-                    return;
-                }
-
-                // 타임스탬프를 붙여 브라우저 캐싱을 원천 차단
-                const cacheBuster = new Date().getTime();
-                const fetchUrl = `${GAS_WEBAPP_URL}?action=getData&t=${cacheBuster}`;
-                
-                const response = await fetch(fetchUrl);
-                const data = await response.json();
-                
-                if(data.success) {
-                    localStorage.setItem('kbc_site_data', JSON.stringify(data));
-                    if(data.adminPassword) ADMIN_PASSWORD = data.adminPassword.toString().trim();
-                    
-                    // 백그라운드 업데이트
-                    applySettings(data.settings);
-                    renderReviews(data.reviews || []);
-                    renderSharing(data.sharing || []);
-                } else if(!window.__KBC_CACHE) {
-                    renderReviews(mockReviews);
-                    renderSharing(mockSharing);
-                }
-            } catch (error) {
-                console.error("데이터 로드 실패:", error);
-                if(!window.__KBC_CACHE) { renderReviews(mockReviews); renderSharing(mockSharing); }
-            } finally {
-                // 캐시가 없는 첫 방문자일 때만 로딩바 숨기기 처리
-                if(!window.__KBC_CACHE) {
-                    if(loaderR) loaderR.classList.add('hidden');
-                    if(containerR) containerR.classList.remove('hidden');
-                    if(loaderS) loaderS.classList.add('hidden');
-                    if(containerS) containerS.classList.remove('hidden');
-                }
+            
+            const data = JSON.parse(match[1]);
+            if (data.status === 'error') {
+                throw new Error(`[${sheetName}] ${data.errors[0].message}`);
             }
+            return data.table;
         }
 
-        function applySettings(settings) {
-            for(const [key, value] of Object.entries(settings)) {
-                const el = document.querySelector(`[data-editable="${key}"]`);
-                if(el && value) el.innerText = value;
+        async function loadAllData() {
+            const [
+                settingsTable, introTable, siteTable, booksTable, 
+                careerTable, qualTable, histTable, propTable
+            ] = await Promise.all([
+                fetchSheet('설정'), fetchSheet('소개'), fetchSheet('안내사이트'), 
+                fetchSheet('저서'), fetchSheet('경력'), fetchSheet('자격사항'), 
+                fetchSheet('강의이력'), fetchSheet('강의제안모음')
+            ]);
+
+            // 1. 설정 (Settings)
+            if(settingsTable && settingsTable.rows.length > 0) {
+                const firstRow = settingsTable.rows[0].c;
+                configData.adminPw = firstRow[0]?.v || ''; 
+                configData.adminEmail = firstRow[1]?.v || ''; 
+                configData.title = firstRow[3]?.v || '가치있는 미래교육 연구소'; 
+                configData.logoUrl = firstRow[4]?.v || ''; 
+                configData.profileUrl = firstRow[5]?.v || 'https://placehold.co/400x400/1E3A8A/ffffff?text=Profile'; 
+
+                document.title = configData.title;
+                document.getElementById('navTitle').innerText = configData.title;
+                document.getElementById('heroTitle').innerText = configData.title;
+                document.getElementById('footerTitle').innerText = configData.title;
                 
-                if(key === 'hero_image' || key === 'profile_image' || key === 'logo_image') {
-                    const imgEl = document.getElementById(key);
-                    if(imgEl && value) {
-                        const urls = getGDriveUrls(value);
-                        loadImageRobustly(imgEl, urls);
+                if(configData.logoUrl) {
+                    const logoEl = document.getElementById('navLogo');
+                    logoEl.src = configData.logoUrl;
+                    logoEl.classList.remove('hidden');
+                }
+                if(configData.profileUrl) {
+                    document.getElementById('profileImg').src = configData.profileUrl;
+                }
+
+                // Categories Dropdown (Column C)
+                const catSelect = document.getElementById('fmCategory');
+                settingsTable.rows.forEach(row => {
+                    const catVal = row.c[2]?.v;
+                    if(catVal) {
+                        const opt = document.createElement('option');
+                        opt.value = catVal;
+                        opt.innerText = catVal;
+                        catSelect.appendChild(opt);
                     }
-                }
+                });
+            }
+
+            // 2. 소개 (Introduction)
+            const introDiv = document.getElementById('heroIntro');
+            if(introTable) {
+                introTable.rows.forEach(row => {
+                    const text = row?.c[0]?.v;
+                    if(text) {
+                        const p = document.createElement('p');
+                        p.innerText = text;
+                        introDiv.appendChild(p);
+                    }
+                });
+            }
+
+            // 3. 안내사이트 (Guide Sites)
+            const sitesDiv = document.getElementById('guideSites');
+            if(siteTable) {
+                siteTable.rows.forEach(row => {
+                    const title = row?.c[0]?.v;
+                    const link = row?.c[1]?.v;
+                    if(title && link) {
+                        const a = document.createElement('a');
+                        a.href = link;
+                        a.target = '_blank';
+                        a.className = "flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl hover:shadow-md hover:border-primary transition group";
+                        a.innerHTML = `<span class="font-medium dark:text-gray-200 group-hover:text-primary transition">${title}</span> <i class="fas fa-external-link-alt text-gray-400 group-hover:text-primary transition"></i>`;
+                        sitesDiv.appendChild(a);
+                    }
+                });
+            }
+
+            // 4. 저서 (Books)
+            const booksList = document.getElementById('booksList');
+            if(booksTable) {
+                booksTable.rows.forEach(row => {
+                    const title = row?.c[0]?.v;
+                    if(title) {
+                        const li = document.createElement('li');
+                        li.className = "flex items-start gap-3 p-3 bg-blue-50/50 dark:bg-gray-800/50 rounded-lg";
+                        li.innerHTML = `<i class="fas fa-bookmark text-primary mt-1"></i> <span class="dark:text-gray-200 font-medium">${title}</span>`;
+                        booksList.appendChild(li);
+                    }
+                });
+            }
+
+            // 5. 경력 (Career)
+            const careerList = document.getElementById('careerList');
+            if(careerTable) {
+                careerTable.rows.forEach(row => {
+                    const period = row?.c[0]?.v;
+                    const content = row?.c[1]?.v;
+                    if(period || content) {
+                        const li = document.createElement('li');
+                        li.className = "relative pl-6 before:content-[''] before:absolute before:left-[-5px] before:top-2 before:w-2 before:h-2 before:bg-primary before:rounded-full text-gray-700 dark:text-gray-300 flex flex-col md:flex-row md:gap-4 mb-4";
+                        li.innerHTML = `<span class="font-bold text-primary dark:text-blue-400 whitespace-nowrap min-w-[140px]">${period || ''}</span> <span>${content || ''}</span>`;
+                        careerList.appendChild(li);
+                    }
+                });
+            }
+
+            // 6. 자격사항 (Qualifications)
+            const qualList = document.getElementById('qualList');
+            if(qualTable) {
+                qualTable.rows.forEach(row => {
+                    const period = row?.c[0]?.v;
+                    const content = row?.c[1]?.v;
+                    if(period || content) {
+                        const div = document.createElement('div');
+                        div.className = "flex items-start md:items-center gap-3 p-3 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 flex-col md:flex-row";
+                        div.innerHTML = `<div class="flex items-center gap-2 min-w-[140px]"><i class="fas fa-certificate text-accent"></i> <span class="font-bold text-primary dark:text-blue-400">${period || ''}</span></div> <span>${content || ''}</span>`;
+                        qualList.appendChild(div);
+                    }
+                });
+            }
+
+            // 7. 강의이력 (Lecture History)
+            const histList = document.getElementById('historyList');
+            if(histTable) {
+                histTable.rows.forEach(row => {
+                    const period = row?.c[0]?.v;
+                    const content = row?.c[1]?.v;
+                    if(period || content) {
+                        const li = document.createElement('li');
+                        li.className = "flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 last:border-0";
+                        li.innerHTML = `<div class="flex items-center gap-2 min-w-[140px]"><i class="fas fa-check text-green-500"></i> <span class="font-bold text-primary dark:text-blue-400">${period || ''}</span></div> <span>${content || ''}</span>`;
+                        histList.appendChild(li);
+                    }
+                });
+            }
+
+            // 8. 강의제안모음 (Lecture Proposals)
+            const propGrid = document.getElementById('proposalsGrid');
+            if(propTable) {
+                propTable.rows.forEach(row => {
+                    const title = row?.c[0]?.v;
+                    const link = row?.c[1]?.v;
+                    if(title && link) {
+                        const a = document.createElement('a');
+                        a.href = link;
+                        a.target = '_blank';
+                        a.className = "block p-6 bg-white dark:bg-darkCard rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 transition transform hover:-translate-y-1 text-center group";
+                        a.innerHTML = `
+                            <div class="w-14 h-14 bg-blue-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary transition shadow-inner">
+                                <i class="fas fa-folder-open text-2xl text-primary group-hover:text-white transition"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2">${title}</h3>
+                            <span class="text-sm text-secondary font-medium">제안서 보기 &rarr;</span>
+                        `;
+                        propGrid.appendChild(a);
+                    }
+                });
             }
         }
 
-        function renderReviews(reviews) {
-            const container = document.getElementById('reviews-container');
-            const loader = document.getElementById('reviews-loader');
-            if(loader) loader.classList.add('hidden'); // 즉시 스피너 제거
-            container.innerHTML = '';
-            
-            reviews.forEach(review => {
-                const card = document.createElement('a');
-                card.href = review.link;
-                card.target = "_blank";
-                card.className = "group bg-brand-deep rounded-2xl overflow-hidden border border-white/10 hover:border-brand-accent transition-all duration-300 block";
-                
-                const deleteBtnHtml = isAdmin ? `<button onclick="deleteReview(event, '${review.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full z-10 hover:bg-red-600"><i class="ph ph-trash"></i></button>` : '';
-                
-                const urls = getGDriveUrls(review.image);
-                const imgId = `review_img_${review.id}`;
-
-                card.innerHTML = `
-                    <div class="relative h-48 overflow-hidden bg-gray-100">
-                        ${deleteBtnHtml}
-                        <img id="${imgId}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="강의 사진" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100" referrerpolicy="no-referrer">
-                        <div class="absolute inset-0 bg-gradient-to-t from-brand-deep to-transparent"></div>
-                    </div>
-                    <div class="p-6 relative -mt-6">
-                        <span class="text-brand-accent text-sm font-semibold mb-2 block">${review.date}</span>
-                        <h3 class="text-lg font-bold text-white group-hover:text-brand-light transition line-clamp-2">${review.title}</h3>
-                        <div class="mt-4 flex items-center text-sm text-gray-400 group-hover:text-white transition">
-                            블로그에서 보기 <i class="ph ph-arrow-right ml-1"></i>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-                loadImageRobustly(document.getElementById(imgId), urls);
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('text-primary', 'border-b-2', 'border-primary');
+                el.classList.add('text-gray-500');
             });
-            container.classList.remove('hidden');
-        }
-
-        function renderSharing(items) {
-            window.sharingData = items; 
-            const container = document.getElementById('sharing-container');
-            const loader = document.getElementById('sharing-loader');
-            if(loader) loader.classList.add('hidden'); // 즉시 스피너 제거
-            container.innerHTML = '';
             
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 relative flex flex-col cursor-pointer";
-                card.onclick = () => openSharingModal(item.id);
-                
-                const deleteBtnHtml = isAdmin ? `<button onclick="deleteSharing(event, '${item.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full z-10 hover:bg-red-600"><i class="ph ph-trash"></i></button>` : '';
-                
-                const urls = getGDriveUrls(item.image);
-                const imgId = `share_img_${item.id}`;
-
-                card.innerHTML = `
-                    ${deleteBtnHtml}
-                    <div class="relative h-56 overflow-hidden bg-gray-100 flex-shrink-0">
-                        <img id="${imgId}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="자료 이미지" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-5">
-                            <h3 class="text-lg font-bold text-white leading-snug line-clamp-2 group-hover:text-brand-light transition">${item.title}</h3>
-                        </div>
-                    </div>
-                    <div class="p-4 flex items-center justify-between bg-white text-sm">
-                        <span class="text-gray-400 font-medium">${item.date}</span>
-                        <span class="text-brand-accent font-bold group-hover:underline flex items-center gap-1">내용 보기 <i class="ph ph-arrow-right"></i></span>
-                    </div>
-                `;
-                container.appendChild(card);
-                loadImageRobustly(document.getElementById(imgId), urls);
-            });
-            container.classList.remove('hidden');
+            document.getElementById(tabId).classList.remove('hidden');
+            const btn = document.getElementById('btn-' + tabId);
+            btn.classList.remove('text-gray-500');
+            btn.classList.add('text-primary', 'border-b-2', 'border-primary');
         }
 
-        // ==========================================
-        // 팝업(모달) 창 제어 함수 및 링크 변환 처리
-        // ==========================================
-        function linkify(text) {
-            if (!text) return '';
-            var urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/ig;
-            return text.replace(urlRegex, function(url) {
-                return '<a href="' + url + '" target="_blank" class="text-brand-accent font-bold hover:underline break-all">' + url + '</a>';
-            });
-        }
-
-        function openSharingModal(id) {
-            const item = window.sharingData.find(x => x.id.toString() === id.toString());
-            if(!item) return;
-
-            document.getElementById('modal-title').innerText = item.title;
-            document.getElementById('modal-date').innerText = item.date;
+        // Form Submission Logic
+        async function handleFormSubmit(e) {
+            e.preventDefault();
             
-            const formattedDesc = linkify(item.description);
-            document.getElementById('modal-desc').innerHTML = formattedDesc;
-            
-            document.getElementById('modal-link').href = item.fileUrl;
-            
-            const modalImg = document.getElementById('modal-image');
-            modalImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; 
-            const urls = getGDriveUrls(item.image);
-            loadImageRobustly(modalImg, urls);
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 전송 중...';
+            submitBtn.disabled = true;
 
-            const modal = document.getElementById('sharing-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden'; 
-        }
+            const formData = new FormData();
+            formData.append('name', document.getElementById('fmName').value);
+            formData.append('org', document.getElementById('fmOrg').value);
+            formData.append('email', document.getElementById('fmEmail').value);
+            formData.append('phone', document.getElementById('fmPhone').value);
+            formData.append('region', document.getElementById('fmRegion').value);
+            formData.append('category', document.getElementById('fmCategory').value);
+            formData.append('fee', document.getElementById('fmFee').value);
+            formData.append('details', document.getElementById('fmDetails').value);
+            formData.append('targetEmail', configData.adminEmail);
 
-        function closeSharingModal() {
-            const modal = document.getElementById('sharing-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = ''; 
-        }
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx7kBqvcT7zAD2XfBXHANRg7ELDArmZoq27kx9BRcEV_zxtX85X_Wx2YWmWh3mrGDAg/exec'; // Apps Script URL
 
-        // ==========================================
-        // 3. 폼 전송 기능 (문의하기)
-        // ==========================================
-        function setupContactForm() {
-            document.getElementById('contact-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const btn = document.getElementById('submit-btn');
-                const spinner = document.getElementById('submit-spinner');
-                const btnText = btn.querySelector('span');
-                
-                btn.disabled = true;
-                btnText.innerText = "전송 중...";
-                spinner.classList.remove('hidden');
-
-                const payload = {
-                    action: "addContact",
-                    name: document.getElementById('contact_name').value,
-                    org: document.getElementById('contact_org').value,
-                    email: document.getElementById('contact_email').value,
-                    topic: document.getElementById('contact_topic').value,
-                    fee: document.getElementById('contact_fee').value,
-                    message: document.getElementById('contact_message').value
-                };
-
-                try {
-                    const response = await fetch(GAS_WEBAPP_URL, {
-                        method: "POST",
-                        body: JSON.stringify(payload)
-                    });
-                    
-                    const result = await response.json();
-                    if(result.success) {
-                        showSuccess();
-                    } else {
-                        alert("전송에 실패했습니다. 다시 시도해주세요.");
-                    }
-                } catch(err) {
-                    console.error(err);
-                    alert("네트워크 오류가 발생했습니다. 블로그 메일로 문의 부탁드립니다.");
-                } finally {
-                    btn.disabled = false;
-                    btnText.innerText = "의뢰서 전송하기";
-                    spinner.classList.add('hidden');
+            try {
+                if (!WEB_APP_URL || WEB_APP_URL === '') {
+                    throw new Error('WEB_APP_URL_MISSING');
                 }
-            });
-        }
 
-        function showSuccess() {
-            document.getElementById('contact-form').classList.add('hidden');
-            document.getElementById('success-message').classList.remove('hidden');
-        }
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: formData
+                });
 
-        // ==========================================
-        // 4. 관리자 모드 (No-Code Admin) 및 파일 직접 업로드
-        // ==========================================
-        async function toggleAdminMode() {
-            if(isAdmin) {
-                isAdmin = false;
-                document.body.classList.remove('admin-mode');
-                document.getElementById('admin-add-review').classList.add('hidden');
-                document.getElementById('admin-add-sharing').classList.add('hidden');
-                showToast("관리자 모드가 종료되었습니다.");
-                loadData(); 
-            } else {
-                const pwd = prompt("관리자 비밀번호를 입력하세요:");
-                if (pwd === null) return; 
-                
-                showToast("인증 서버 확인 중...");
-                const latestPass = await fetchAdminPassword(); 
-
-                const inputPwd = pwd.trim();
-                const serverPwd = latestPass ? latestPass.trim() : ADMIN_PASSWORD.trim();
-
-                if(inputPwd === serverPwd) {
-                    isAdmin = true;
-                    document.body.classList.add('admin-mode');
-                    document.getElementById('admin-add-review').classList.remove('hidden');
-                    document.getElementById('admin-add-sharing').classList.remove('hidden');
-                    setupEditableElements();
-                    showToast("관리자 모드 활성화 됨. 텍스트를 클릭하여 수정하세요.");
-                    loadData(); 
+                if(response.ok) {
+                    document.getElementById('msgTitle').innerText = '문의 접수 완료';
+                    document.getElementById('msgDesc').innerHTML = `작성하신 내용이 담당자에게 이메일로 전송되었으며,<br>구글 시트의 '문의내역'에 성공적으로 기록되었습니다.`;
+                    document.getElementById('msgModal').classList.remove('hidden');
+                    e.target.reset();
                 } else {
-                    alert("비밀번호가 일치하지 않습니다.\n(입력하신 값: " + inputPwd + ")");
+                    throw new Error('Network Error');
                 }
-            }
-        }
+            } catch(error) {
+                if (error.message === 'WEB_APP_URL_MISSING') {
+                    const mailBody = `
+담당자 이름: ${formData.get('name')}
+소속기관 및 학교: ${formData.get('org')}
+연락처(이메일): ${formData.get('email')}
+연락처(전화번호): ${formData.get('phone')}
+지역: ${formData.get('region')}
+희망교육분야: ${formData.get('category')}
+예상강의료: ${formData.get('fee')}
 
-        function setupEditableElements() {
-            document.querySelectorAll('[data-editable]').forEach(el => {
-                el.replaceWith(el.cloneNode(true));
-            });
-            
-            document.querySelectorAll('[data-editable]').forEach(el => {
-                el.addEventListener('click', async (e) => {
-                    if(!isAdmin) return;
-                    e.preventDefault();
+상세문의내용:
+${formData.get('details')}
+                    `;
+                    const targetEmail = configData.adminEmail || 'test@example.com';
                     
-                    const key = el.getAttribute('data-editable');
-                    const currentVal = el.innerText;
-                    const newVal = prompt("새로운 내용을 입력하세요:", currentVal);
+                    document.getElementById('msgTitle').innerText = '문의 접수 완료 (로컬 모드)';
+                    document.getElementById('msgDesc').innerHTML = `
+                        작성하신 내용이 메일 클라이언트를 통해 전송 준비되었습니다.<br>
+                        <span class="text-xs text-red-500 mt-2 block">* 시스템 안내: 구글 시트 자동 기록을 위해서는 Apps Script 배포 설정이 필요합니다.</span>
+                    `;
+                    document.getElementById('msgModal').classList.remove('hidden');
                     
-                    if(newVal !== null && newVal !== currentVal) {
-                        el.innerText = newVal;
-                        await saveSetting(key, newVal);
-                    }
-                });
-            });
-        }
+                    setTimeout(() => {
+                        window.location.href = `mailto:${targetEmail}?subject=${encodeURIComponent(`[강의의뢰] ${formData.get('org')} - ${formData.get('name')}님`)}&body=${encodeURIComponent(mailBody)}`;
+                        e.target.reset();
+                    }, 1500);
 
-        async function editImage(imageId) {
-            if(!isAdmin) return;
-            
-            const choice = confirm("PC/스마트폰에 있는 '사진 파일'을 직접 업로드 하시겠습니까?\n(취소를 누르면 기존처럼 링크를 입력합니다.)");
-            
-            if (choice) {
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = 'image/*';
-                
-                fileInput.onchange = async e => {
-                    const file = e.target.files[0];
-                    if(!file) return;
-                    if(file.size > 5 * 1024 * 1024) { alert("이미지 용량이 너무 큽니다. 5MB 이하의 사진을 선택해주세요."); return; }
-
-                    const reader = new FileReader();
-                    reader.onload = async function(event) {
-                        const base64Data = event.target.result.split(',')[1];
-                        showToast("사진을 서버로 업로드 중입니다. 잠시만 기다려주세요...");
-                        try {
-                            const response = await fetch(GAS_WEBAPP_URL, {
-                                method: "POST",
-                                body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type, data: base64Data })
-                            });
-                            const result = await response.json();
-                            if(result.success && result.fileId) {
-                                const newUrl = `https://lh3.googleusercontent.com/d/${result.fileId}`;
-                                await saveSetting(imageId, newUrl);
-                                const urls = getGDriveUrls(newUrl);
-                                loadImageRobustly(document.getElementById(imageId), urls);
-                                showToast("사진 업로드 및 적용 완료!");
-                            } else {
-                                alert("업로드에 실패했습니다.");
-                            }
-                        } catch(err) {
-                            alert("업로드 중 통신 오류가 발생했습니다.");
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                };
-                fileInput.click();
-            } else {
-                const currentSrc = document.getElementById(imageId).src;
-                let newSrc = prompt("새로운 이미지 URL을 입력하세요 (구글 드라이브 공유 링크 등):", currentSrc);
-                if(newSrc && newSrc !== currentSrc) {
-                    await saveSetting(imageId, newSrc);
-                    const urls = getGDriveUrls(newSrc);
-                    loadImageRobustly(document.getElementById(imageId), urls);
+                } else {
+                    alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
                 }
+            } finally {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
             }
         }
 
-        async function saveSetting(key, value) {
-            if(!GAS_WEBAPP_URL) {
-                showToast(`(데모) ${key} 저장됨`);
-                return;
-            }
-            try {
-                showToast("저장 중...");
-                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "updateSetting", key: key, value: value }) });
-                const result = await response.json();
-                if(result.success) showToast("저장 완료!");
-                else showToast("저장 실패");
-            } catch(e) {
-                showToast("네트워크 오류로 저장 실패");
-            }
+        function closeMsgModal() {
+            document.getElementById('msgModal').classList.add('hidden');
         }
 
-        // ==========================================
-        // 무료 나눔 업로드 프롬프트
-        // ==========================================
-        async function addSharingPrompt() {
-            const title = prompt("무료 나눔 제목을 입력하세요:");
-            if(!title) return;
-            const desc = prompt("자료에 대한 상세 설명을 입력하세요 (게시물 클릭 시 보임):");
-            if(!desc) return;
-            
-            let image = "";
-            const imgChoice = confirm("썸네일 사진을 파일로 직접 업로드 하시겠습니까?\n(취소 클릭 시 구글 드라이브 링크 직접 입력)");
-            if (imgChoice) {
-                image = await new Promise((resolve) => {
-                    const fileInput = document.createElement('input');
-                    fileInput.type = 'file';
-                    fileInput.accept = 'image/*';
-                    fileInput.onchange = async e => {
-                        const file = e.target.files[0];
-                        if(!file) { resolve(""); return; }
-                        if(file.size > 5 * 1024 * 1024) { alert("5MB 이하만 가능합니다."); resolve(""); return; }
-                        const reader = new FileReader();
-                        reader.onload = async function(event) {
-                            showToast("썸네일 이미지 업로드 중...");
-                            try {
-                                const res = await fetch(GAS_WEBAPP_URL, {
-                                    method: "POST",
-                                    body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type, data: event.target.result.split(',')[1] })
-                                });
-                                const r = await res.json();
-                                resolve(r.success && r.fileId ? `https://lh3.googleusercontent.com/d/${r.fileId}` : "");
-                            } catch(err) { alert("통신 오류"); resolve(""); }
-                        };
-                        reader.readAsDataURL(file);
-                    };
-                    fileInput.click();
-                });
+        // Admin Modal Logic
+        function openAdminModal() {
+            document.getElementById('adminPw').value = '';
+            document.getElementById('adminModal').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('adminModalContent').classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModalContent').classList.add('scale-95');
+            setTimeout(() => {
+                document.getElementById('adminModal').classList.add('hidden');
+            }, 200);
+        }
+
+        function verifyAdmin() {
+            const inputPw = document.getElementById('adminPw').value;
+            if(inputPw === configData.adminPw && configData.adminPw !== '') {
+                window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}`, '_blank');
+                closeAdminModal();
             } else {
-                image = prompt("썸네일 이미지 URL (구글 드라이브 링크 등):");
+                alert('비밀번호가 일치하지 않습니다.');
             }
-            if(!image) return;
-
-            let fileUrl = "";
-            const fileChoice = confirm("공유할 '프로그램/자료'를 직접 업로드 하시겠습니까?\n(10MB 이하 권장. 취소 클릭 시 구글 드라이브 다운로드 링크 직접 입력)");
-            if (fileChoice) {
-                fileUrl = await new Promise((resolve) => {
-                    const fileInput = document.createElement('input');
-                    fileInput.type = 'file';
-                    fileInput.onchange = async e => {
-                        const file = e.target.files[0];
-                        if(!file) { resolve(""); return; }
-                        if(file.size > 15 * 1024 * 1024) { alert("용량 초과! 큰 파일은 구글 드라이브에 올린 후 직접 링크를 입력해주세요."); resolve(""); return; }
-                        const reader = new FileReader();
-                        reader.onload = async function(event) {
-                            showToast(`'${file.name}' 업로드 중...`);
-                            try {
-                                const res = await fetch(GAS_WEBAPP_URL, {
-                                    method: "POST",
-                                    body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type || "application/octet-stream", data: event.target.result.split(',')[1] })
-                                });
-                                const r = await res.json();
-                                resolve(r.success && r.fileId ? `https://drive.google.com/uc?export=download&id=${r.fileId}` : "");
-                            } catch(err) { alert("통신 오류"); resolve(""); }
-                        };
-                        reader.readAsDataURL(file);
-                    };
-                    fileInput.click();
-                });
-            } else {
-                fileUrl = prompt("공유할 파일의 다운로드 링크를 입력하세요:");
-            }
-            if(!fileUrl) return;
-
-            const payload = { action: "addSharing", title: title, description: desc, image: image, fileUrl: fileUrl, date: new Date().toLocaleDateString('ko-KR') };
-            try {
-                showToast("자료 추가 중...");
-                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify(payload) });
-                const result = await response.json();
-                if(result.success) { showToast("추가 완료!"); loadData(); }
-            } catch(e) { showToast("추가 실패"); }
-        }
-
-        async function deleteSharing(e, id) {
-            e.preventDefault();
-            e.stopPropagation();
-            if(!confirm("이 나눔 자료를 삭제하시겠습니까?")) return;
-            try {
-                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "deleteSharing", id: id }) });
-                const result = await response.json();
-                if(result.success) { showToast("삭제 완료"); loadData(); }
-            } catch(e) { showToast("삭제 실패"); }
-        }
-
-        // ==========================================
-        // 기존 리뷰 업로드 프롬프트
-        // ==========================================
-        async function addReviewPrompt() {
-            const title = prompt("리뷰 제목:");
-            if(!title) return;
-            const link = prompt("네이버 블로그 링크 URL:");
-            if(!link) return;
-            
-            const choice = confirm("썸네일 사진을 파일로 직접 업로드 하시겠습니까?\n(취소 클릭 시 기존처럼 링크로 입력)");
-            
-            if (choice) {
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = 'image/*';
-                
-                fileInput.onchange = async e => {
-                    const file = e.target.files[0];
-                    if(!file) return;
-                    if(file.size > 5 * 1024 * 1024) { alert("이미지 용량은 5MB 이하여야 합니다."); return; }
-
-                    const reader = new FileReader();
-                    reader.onload = async function(event) {
-                        showToast("리뷰 이미지 업로드 중...");
-                        try {
-                            const response = await fetch(GAS_WEBAPP_URL, {
-                                method: "POST",
-                                body: JSON.stringify({ action: "uploadImage", filename: file.name, mimeType: file.type, data: event.target.result.split(',')[1] })
-                            });
-                            const result = await response.json();
-                            if(result.success && result.fileId) {
-                                const newUrl = `https://lh3.googleusercontent.com/d/${result.fileId}`;
-                                saveReviewData(title, link, newUrl);
-                            } else { alert("이미지 업로드 실패"); }
-                        } catch(err) { alert("업로드 통신 오류"); }
-                    };
-                    reader.readAsDataURL(file);
-                };
-                fileInput.click();
-            } else {
-                let image = prompt("썸네일 이미지 URL (구글 드라이브 링크/네이버 블로그 주소 등):");
-                if(!image) return;
-                saveReviewData(title, link, image);
-            }
-        }
-
-        async function saveReviewData(title, link, image) {
-            const payload = { action: "addReview", title: title, link: link, image: image, date: new Date().toLocaleDateString('ko-KR') };
-            try {
-                showToast("리뷰 추가 중...");
-                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify(payload) });
-                const result = await response.json();
-                if(result.success) { showToast("리뷰 추가 완료!"); loadData(); }
-            } catch(e) { showToast("리뷰 추가 실패"); }
-        }
-
-        async function deleteReview(e, id) {
-            e.preventDefault();
-            e.stopPropagation();
-            if(!confirm("이 리뷰를 삭제하시겠습니까?")) return;
-            try {
-                const response = await fetch(GAS_WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "deleteReview", id: id }) });
-                const result = await response.json();
-                if(result.success) { showToast("삭제 완료"); loadData(); }
-            } catch(e) { showToast("삭제 실패"); }
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
 </body>
